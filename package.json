@@ -1,30 +1,35 @@
 {
-  "name": "zed-hustle-marketplace",
+  "name": "zedhustle-marketplace",
   "version": "1.0.0",
-  "description": "Zambian Freelance Marketplace with Bidding System and Virtual Trading",
-  "main": "public/index.html",
+  "description": "ZED HUSTLE - Freelance Marketplace with AI-Powered Commodity Trading",
+  "main": "index.html",
   "scripts": {
-    "start": "npx serve public",
-    "dev": "npx serve public",
-    "build": "echo 'Static files ready in public folder'",
-    "deploy": "vercel --prod"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "update-prices": "node scripts/update-prices.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "openai": "^4.20.0",
+    "node-fetch": "^3.3.2",
+    "next": "14.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "eslint-config-next": "14.0.0"
   },
   "keywords": [
     "freelance",
     "marketplace",
     "zambia",
-    "bidding",
     "trading",
-    "supabase",
-    "vercel"
+    "commodities",
+    "ai"
   ],
-  "author": "ZED HUSTLE",
-  "license": "MIT",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.54.0"
-  },
-  "devDependencies": {
-    "serve": "^14.2.0",
-    "vercel": "^32.0.0"
-  }
+  "author": "ZED HUSTLE Team",
+  "license": "MIT"
 }
