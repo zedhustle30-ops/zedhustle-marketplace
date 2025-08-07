@@ -55,6 +55,17 @@ function initializeEventListeners() {
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('signupForm').addEventListener('submit', handleSignup);
     
+    // Modal switching buttons
+    document.getElementById('switchToLoginBtn').addEventListener('click', () => {
+        closeAllModals();
+        setTimeout(() => showModal('loginModal'), 100);
+    });
+    
+    document.getElementById('switchToSignupBtn').addEventListener('click', () => {
+        closeAllModals();
+        setTimeout(() => showModal('signupModal'), 100);
+    });
+    
     // Job filters
     document.getElementById('categoryFilter').addEventListener('change', filterJobs);
     document.getElementById('locationFilter').addEventListener('change', filterJobs);

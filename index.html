@@ -504,56 +504,83 @@
 
     <!-- Modals -->
     <div id="loginModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content login-modal">
             <span class="close">&times;</span>
-            <h2>Login to ZED HUSTLE</h2>
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your ZED HUSTLE account</p>
+            </div>
             <form id="loginForm" class="auth-form">
-                <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
             </form>
-            <p class="auth-switch">Don't have an account? <a href="#" id="switchToSignup">Sign up</a></p>
+            <div class="auth-footer">
+                <p class="auth-switch">Don't have an account? <button class="btn btn-outline btn-small" id="switchToSignupBtn">Sign Up</button></p>
+            </div>
         </div>
     </div>
 
     <div id="signupModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content signup-modal">
             <span class="close">&times;</span>
-            <h2>Join ZED HUSTLE</h2>
+            <div class="auth-header">
+                <h2>Join ZED HUSTLE</h2>
+                <p>Create your account and start earning</p>
+            </div>
             <form id="signupForm" class="auth-form">
-                <div class="form-group">
-                    <label for="signupName">Full Name</label>
-                    <input type="text" id="signupName" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your full name" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="signupEmail">Email</label>
-                    <input type="email" id="signupEmail" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="signupEmail">Email Address</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="signupPhone">Phone Number</label>
-                    <input type="tel" id="signupPhone" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="signupPhone">Phone Number</label>
+                        <input type="tel" id="signupPhone" placeholder="Enter your phone number" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="signupPassword">Password</label>
-                    <input type="password" id="signupPassword" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a strong password" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="referralCode">Referral Code (Optional)</label>
-                    <input type="text" id="referralCode">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="referralCode">Referral Code (Optional)</label>
+                        <input type="text" id="referralCode" placeholder="Enter referral code if you have one">
+                    </div>
                 </div>
                 <div class="payment-notice">
                     <i class="fas fa-info-circle"></i>
-                    <p>Signup fee: K30. You'll get 50 bids and 1 week full access after payment.</p>
+                    <div class="payment-info">
+                        <p><strong>Signup fee: K30</strong></p>
+                        <p>You'll get 50 bids and 1 week full access after payment</p>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Create Account</button>
+                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
             </form>
-            <p class="auth-switch">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+            <div class="auth-footer">
+                <p class="auth-switch">Already have an account? <button class="btn btn-outline btn-small" id="switchToLoginBtn">Sign In</button></p>
+            </div>
         </div>
     </div>
 
