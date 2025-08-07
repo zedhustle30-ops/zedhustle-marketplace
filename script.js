@@ -2,6 +2,11 @@
 let currentUser = null;
 let jobs = [];
 
+// Initialize Supabase client
+const supabaseUrl = 'https://jpdndlnblbbtaxcrsyfm.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZG5kbG5ibGJidGF4Y3JzeWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MzMzNDEsImV4cCI6MjA3MDAwOTM0MX0.jJKRrinjTqoI5azn1YYRXyVYSKfLYJ1M-G-Vl-CAL-Q';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
 // Sample jobs data
 const sampleJobs = [
     {
@@ -33,11 +38,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-function initializeApp() {
+async function initializeApp() {
     jobs = [...sampleJobs];
     initializeEventListeners();
     loadJobs();
-    checkAuthStatus();
+    await checkAuthStatus();
 }
 
 function initializeEventListeners() {
@@ -72,33 +77,63 @@ function initializeEventListeners() {
 }
 
 // Authentication Functions
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
     
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
-    if (email && password) {
-        const user = getUserByEmail(email);
-        
-        if (user) {
-            if (user.hasPaidSignupFee) {
-                currentUser = user;
+    if (!email || !password) {
+        showNotification('Please fill in all fields.', 'error');
+        return;
+    }
+
+    try {
+        // Show loading state
+        const loginBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = loginBtn.textContent;
+        loginBtn.textContent = 'Signing in...';
+        loginBtn.disabled = true;
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            if (error.message.includes('Invalid login credentials')) {
+                showNotification('Invalid email or password.', 'error');
+            } else {
+                showNotification('Login failed: ' + error.message, 'error');
+            }
+        } else {
+            // Get user profile from database
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', email)
+                .single();
+
+            if (profileError && profileError.code !== 'PGRST116') {
+                showNotification('Error loading user profile.', 'error');
+            } else {
+                currentUser = profile || { email: data.user.email, id: data.user.id };
                 closeAllModals();
                 updateUIForLoggedInUser();
                 showNotification('Login successful!', 'success');
-            } else {
-                showPaymentPrompt(user);
             }
-        } else {
-            showNotification('Invalid credentials.', 'error');
         }
-    } else {
-        showNotification('Please fill in all fields.', 'error');
+    } catch (error) {
+        showNotification('Login failed: ' + error.message, 'error');
+    } finally {
+        // Reset button state
+        const loginBtn = e.target.querySelector('button[type="submit"]');
+        loginBtn.textContent = 'Sign In';
+        loginBtn.disabled = false;
     }
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
     e.preventDefault();
     
     const formData = {
@@ -106,33 +141,83 @@ function handleSignup(e) {
         email: document.getElementById('signupEmail').value,
         phone: document.getElementById('signupPhone').value,
         password: document.getElementById('signupPassword').value,
-        referralCode: document.getElementById('referralCode').value
+        referralCode: document.getElementById('referralCode')?.value || ''
     };
     
     if (!formData.name || !formData.email || !formData.phone || !formData.password) {
         showNotification('Please fill in all required fields.', 'error');
         return;
     }
-    
-    if (getUserByEmail(formData.email)) {
-        showNotification('User with this email already exists.', 'error');
+
+    // Check password strength
+    if (formData.password.length < 6) {
+        showNotification('Password must be at least 6 characters long.', 'error');
         return;
     }
-    
-    const newUser = {
-        id: generateId(),
-        ...formData,
-        hasPaidSignupFee: false,
-        bids: 0,
-        wallet: 0,
-        referralEarnings: 0,
-        referralCode: generateReferralCode(),
-        createdAt: new Date().toISOString()
-    };
-    
-    saveUser(newUser);
-    closeAllModals();
-    showPaymentPrompt(newUser);
+
+    try {
+        // Show loading state
+        const signupBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = signupBtn.textContent;
+        signupBtn.textContent = 'Creating account...';
+        signupBtn.disabled = true;
+
+        // Create user in Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+            email: formData.email,
+            password: formData.password,
+            options: {
+                data: {
+                    full_name: formData.name,
+                    phone: formData.phone
+                }
+            }
+        });
+
+        if (error) {
+            if (error.message.includes('For security purposes')) {
+                showNotification('Please wait 30 seconds before trying again.', 'error');
+            } else if (error.message.includes('already registered')) {
+                showNotification('An account with this email already exists.', 'error');
+            } else {
+                showNotification('Signup failed: ' + error.message, 'error');
+            }
+        } else {
+            // Create user profile in database
+            const userProfile = {
+                id: data.user.id,
+                email: formData.email,
+                full_name: formData.name,
+                phone: formData.phone,
+                has_paid_signup_fee: false,
+                bids: 0,
+                wallet: 0,
+                referral_earnings: 0,
+                referral_code: generateReferralCode(),
+                created_at: new Date().toISOString()
+            };
+
+            const { error: profileError } = await supabase
+                .from('users')
+                .insert([userProfile]);
+
+            if (profileError) {
+                showNotification('Account created but profile setup failed. Please contact support.', 'error');
+            } else {
+                currentUser = userProfile;
+                closeAllModals();
+                showPaymentPrompt(userProfile);
+                showNotification('Account created successfully! Please complete payment.', 'success');
+            }
+        }
+    } catch (error) {
+        showNotification('Signup failed: ' + error.message, 'error');
+    } finally {
+        // Reset button state
+        const signupBtn = e.target.querySelector('button[type="submit"]');
+        signupBtn.textContent = 'Create Account';
+        signupBtn.disabled = false;
+    }
 }
 
 function showPaymentPrompt(user) {
@@ -372,16 +457,47 @@ function showUserDashboard() {
     document.body.appendChild(modal);
 }
 
-function logout() {
-    currentUser = null;
-    location.reload();
+async function logout() {
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            showNotification('Logout failed: ' + error.message, 'error');
+        } else {
+            currentUser = null;
+            location.reload();
+            showNotification('Logged out successfully.', 'info');
+        }
+    } catch (error) {
+        showNotification('Logout failed: ' + error.message, 'error');
+    }
 }
 
-function checkAuthStatus() {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        updateUIForLoggedInUser();
+async function checkAuthStatus() {
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+            console.log('Auth check error:', error.message);
+            return;
+        }
+        
+        if (user) {
+            // Get user profile from database
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+            
+            if (profileError && profileError.code !== 'PGRST116') {
+                console.log('Profile fetch error:', profileError.message);
+            } else {
+                currentUser = profile || { email: user.email, id: user.id };
+                updateUIForLoggedInUser();
+            }
+        }
+    } catch (error) {
+        console.log('Auth check failed:', error.message);
     }
 }
 
