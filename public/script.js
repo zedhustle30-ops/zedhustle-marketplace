@@ -157,17 +157,17 @@ async function handleSignup(e) {
         
         if (authError) {
             showNotification('Signup failed: ' + authError.message, 'error');
-            return;
-        }
-        
+        return;
+    }
+    
         // Create user profile in database
-        const newUser = {
+    const newUser = {
             email: formData.email,
             name: formData.name,
             phone: formData.phone,
             has_paid_signup_fee: false,
-            bids: 0,
-            wallet: 0,
+        bids: 0,
+        wallet: 0,
             referral_earnings: 0,
             referral_code: generateReferralCode()
         };
@@ -188,7 +188,7 @@ async function handleSignup(e) {
             await processReferral(formData.referralCode, profileData.id);
         }
         
-        closeAllModals();
+    closeAllModals();
         showPaymentPrompt(profileData);
         
     } catch (error) {
@@ -303,10 +303,10 @@ async function loadJobs() {
     } catch (error) {
         console.error('Error loading jobs:', error);
         // Fallback to sample jobs
-        jobs.forEach(job => {
-            const jobCard = createJobCard(job);
-            jobsGrid.appendChild(jobCard);
-        });
+    jobs.forEach(job => {
+        const jobCard = createJobCard(job);
+        jobsGrid.appendChild(jobCard);
+    });
     }
 }
 
@@ -380,13 +380,13 @@ async function applyForJob(jobId) {
         
         if (updateError) {
             showNotification('Error updating bids: ' + updateError.message, 'error');
-            return;
-        }
-        
+        return;
+    }
+    
         // Update local user object
         currentUser.bids -= job.bids_required;
-        updateUserStats();
-        showNotification(`Successfully applied for "${job.title}"!`, 'success');
+    updateUserStats();
+    showNotification(`Successfully applied for "${job.title}"!`, 'success');
         
     } catch (error) {
         showNotification('Error applying for job: ' + error.message, 'error');
@@ -516,8 +516,8 @@ async function logout() {
             return;
         }
         
-        currentUser = null;
-        location.reload();
+    currentUser = null;
+    location.reload();
     } catch (error) {
         showNotification('Logout failed: ' + error.message, 'error');
     }

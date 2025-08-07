@@ -9,14 +9,22 @@
     "build": "echo 'Static files ready in public folder'",
     "deploy": "vercel --prod"
   },
-  "keywords": ["freelance", "marketplace", "zambia", "bidding", "trading", "supabase", "vercel"],
+  "keywords": [
+    "freelance",
+    "marketplace",
+    "zambia",
+    "bidding",
+    "trading",
+    "supabase",
+    "vercel"
+  ],
   "author": "ZED HUSTLE",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.0"
+    "@supabase/supabase-js": "^2.54.0"
   },
   "devDependencies": {
     "serve": "^14.2.0",
     "vercel": "^32.0.0"
   }
-} 
+}
