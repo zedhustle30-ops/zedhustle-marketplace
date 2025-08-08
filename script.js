@@ -7,6 +7,10 @@ const supabaseUrl = 'https://jpdndlnblbbtaxcrsyfm.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZG5kbG5ibGJidGF4Y3JzeWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MzMzNDEsImV4cCI6MjA3MDAwOTM0MX0.jJKRrinjTqoI5azn1YYRXyVYSKfLYJ1M-G-Vl-CAL-Q';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
+// Admin access configuration
+const ADMIN_EMAIL = 'admin@zedhustle.com';
+const ADMIN_PASSWORD_HASH = 'ZH2024$ADMIN#SECURE'; // This should be hashed in production
+
 // Sample jobs data
 const sampleJobs = [
     {
@@ -43,6 +47,26 @@ async function initializeApp() {
     initializeEventListeners();
     loadJobs();
     await checkAuthStatus();
+    initializeAdminAccess();
+}
+
+// Secure admin access system
+function initializeAdminAccess() {
+    let keySequence = '';
+    const adminSequence = 'ZEDHUSTLE';
+    
+    document.addEventListener('keydown', (e) => {
+        keySequence += e.key.toUpperCase();
+        
+        if (keySequence.length > adminSequence.length) {
+            keySequence = keySequence.slice(-adminSequence.length);
+        }
+        
+        if (keySequence === adminSequence) {
+            keySequence = '';
+            showSecureAdminLogin();
+        }
+    });
 }
 
 function initializeEventListeners() {
@@ -197,16 +221,22 @@ async function handleSignup(e) {
                 created_at: new Date().toISOString()
             };
 
-            const { error: profileError } = await supabase
+            console.log('Creating user profile:', userProfile);
+
+            const { data: insertedUser, error: profileError } = await supabase
                 .from('users')
-                .insert([userProfile]);
+                .insert([userProfile])
+                .select()
+                .single();
 
             if (profileError) {
-                showNotification('Account created but profile setup failed. Please contact support.', 'error');
+                console.error('Profile creation error:', profileError);
+                showNotification('Account created but profile setup failed: ' + profileError.message, 'error');
             } else {
-                currentUser = userProfile;
+                console.log('Profile created successfully:', insertedUser);
+                currentUser = insertedUser;
                 closeAllModals();
-                showPaymentPrompt(userProfile);
+                showPaymentPrompt(insertedUser);
                 showNotification('Account created successfully! Please complete payment.', 'success');
             }
         }
@@ -538,4 +568,235 @@ function processReferral(referralCode) {
         saveUser(referrer);
         showNotification(`Referral bonus of K5 credited to ${referrer.name}!`, 'success');
     }
+}
+
+// Secure Admin Functions
+function showSecureAdminLogin() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="auth-header">
+                <h2><i class="fas fa-shield-alt"></i> Admin Access</h2>
+                <p>Authorized Personnel Only</p>
+            </div>
+            <form class="auth-form" id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Admin Email</label>
+                    <input type="email" id="adminEmail" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password</label>
+                    <input type="password" id="adminPassword" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i> Access Admin Panel
+                </button>
+                <button type="button" class="btn btn-outline" onclick="this.closest('.modal').remove()" style="margin-top: 0.5rem;">
+                    Cancel
+                </button>
+            </form>
+        </div>
+    `;
+    
+    modal.querySelector('#adminLoginForm').addEventListener('submit', handleAdminLogin);
+    document.body.appendChild(modal);
+}
+
+async function handleAdminLogin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('adminEmail').value;
+    const password = document.getElementById('adminPassword').value;
+    
+    // Enhanced security check
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD_HASH) {
+        // Additional security: Check if user is on localhost or specific domain
+        const isSecureEnvironment = window.location.hostname === 'localhost' || 
+                                   window.location.hostname === '127.0.0.1' ||
+                                   window.location.hostname.includes('zedhustle');
+        
+        if (isSecureEnvironment) {
+            e.target.closest('.modal').remove();
+            showAdminPanel();
+            showNotification('Admin access granted', 'success');
+        } else {
+            showNotification('Admin access denied: Unauthorized environment', 'error');
+        }
+    } else {
+        showNotification('Invalid admin credentials', 'error');
+        // Add delay to prevent brute force
+        setTimeout(() => {
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPassword').value = '';
+        }, 2000);
+    }
+}
+
+function showAdminPanel() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+            <div class="auth-header">
+                <h2><i class="fas fa-cogs"></i> ZED HUSTLE Admin Panel</h2>
+                <p>System Administration Dashboard</p>
+            </div>
+            <div class="admin-panel" style="padding: 1.5rem; overflow-y: auto;">
+                <div class="admin-tabs">
+                    <button class="admin-tab-btn active" onclick="showAdminTab('users')">
+                        <i class="fas fa-users"></i> Users
+                    </button>
+                    <button class="admin-tab-btn" onclick="showAdminTab('jobs')">
+                        <i class="fas fa-briefcase"></i> Jobs
+                    </button>
+                    <button class="admin-tab-btn" onclick="showAdminTab('payments')">
+                        <i class="fas fa-credit-card"></i> Payments
+                    </button>
+                    <button class="admin-tab-btn" onclick="showAdminTab('settings')">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+                
+                <div id="admin-users" class="admin-tab-content active">
+                    <h3>User Management</h3>
+                    <div class="admin-stats">
+                        <div class="stat-card">
+                            <h4>Total Users</h4>
+                            <p class="stat-value" id="totalUsers">Loading...</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Paid Users</h4>
+                            <p class="stat-value" id="paidUsers">Loading...</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Revenue</h4>
+                            <p class="stat-value" id="totalRevenue">Loading...</p>
+                        </div>
+                    </div>
+                    <div id="usersList">Loading users...</div>
+                </div>
+                
+                <div id="admin-jobs" class="admin-tab-content">
+                    <h3>Job Management</h3>
+                    <button class="btn btn-primary" onclick="addNewJob()">
+                        <i class="fas fa-plus"></i> Add New Job
+                    </button>
+                    <div id="jobsList" style="margin-top: 1rem;">Loading jobs...</div>
+                </div>
+                
+                <div id="admin-payments" class="admin-tab-content">
+                    <h3>Payment Management</h3>
+                    <div id="paymentsList">Loading payments...</div>
+                </div>
+                
+                <div id="admin-settings" class="admin-tab-content">
+                    <h3>System Settings</h3>
+                    <div class="settings-section">
+                        <h4>Platform Settings</h4>
+                        <div class="form-group">
+                            <label>Signup Fee (K)</label>
+                            <input type="number" id="signupFee" value="30" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Referral Bonus (K)</label>
+                            <input type="number" id="referralBonus" value="5" min="0">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 1rem; border-top: 1px solid #e5e7eb; text-align: center;">
+                <button class="btn btn-outline" onclick="this.closest('.modal').remove()">
+                    <i class="fas fa-times"></i> Close Admin Panel
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    loadAdminData();
+}
+
+function showAdminTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.admin-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(`admin-${tabName}`).classList.add('active');
+    event.target.classList.add('active');
+}
+
+async function loadAdminData() {
+    try {
+        // Load user statistics
+        const { data: users, error: usersError } = await supabase
+            .from('users')
+            .select('*');
+            
+        if (!usersError && users) {
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('paidUsers').textContent = users.filter(u => u.has_paid_signup_fee).length;
+            document.getElementById('totalRevenue').textContent = `K${(users.filter(u => u.has_paid_signup_fee).length * 30).toFixed(2)}`;
+            
+            // Display users list
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = users.map(user => `
+                <div class="user-item" style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${user.full_name}</strong> (${user.email})
+                            <br><small>Phone: ${user.phone || 'N/A'} | Bids: ${user.bids} | Wallet: K${user.wallet}</small>
+                        </div>
+                        <div>
+                            <span class="badge ${user.has_paid_signup_fee ? 'badge-success' : 'badge-warning'}">
+                                ${user.has_paid_signup_fee ? 'Paid' : 'Unpaid'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Load jobs
+        const jobsList = document.getElementById('jobsList');
+        jobsList.innerHTML = jobs.map(job => `
+            <div class="job-item" style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem;">
+                <h4>${job.title}</h4>
+                <p><strong>Company:</strong> ${job.company}</p>
+                <p><strong>Location:</strong> ${job.location}</p>
+                <p><strong>Salary:</strong> ${job.salary}</p>
+                <button class="btn btn-sm btn-outline" onclick="editJob(${job.id})">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteJob(${job.id})">Delete</button>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading admin data:', error);
+        showNotification('Error loading admin data', 'error');
+    }
+}
+
+function saveSettings() {
+    const signupFee = document.getElementById('signupFee').value;
+    const referralBonus = document.getElementById('referralBonus').value;
+    
+    localStorage.setItem('adminSettings', JSON.stringify({
+        signupFee: parseFloat(signupFee),
+        referralBonus: parseFloat(referralBonus)
+    }));
+    
+    showNotification('Settings saved successfully', 'success');
 } 
