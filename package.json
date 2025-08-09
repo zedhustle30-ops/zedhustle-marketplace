@@ -6,10 +6,12 @@
   "scripts": {
     "start": "http-server public -p 3000",
     "dev": "http-server public -p 3000 -o",
-    "build": "echo 'Static site - no build needed'",
-    "serve": "http-server public"
+    "build": "echo 'No build step needed - static files ready'",
+    "serve": "http-server public",
+    "vercel-build": "echo 'Build complete - static files in public/'"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
     "http-server": "^14.1.1"
   },
   "keywords": [

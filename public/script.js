@@ -1,8 +1,11 @@
+// Import Supabase client
+import { supabase } from '../lib/supabaseClient.js';
+
 // Global variables
 let currentUser = null;
 let jobs = [];
 
-// Sample jobs data
+// Sample jobs data (will be loaded from Supabase)
 const sampleJobs = [
     {
         id: 1,
