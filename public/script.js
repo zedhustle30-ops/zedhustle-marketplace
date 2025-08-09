@@ -752,6 +752,87 @@ window.addEventListener('click', (e) => {
     }
 });
 
+// Additional utility functions
+function copyReferralCode() {
+    const referralCode = document.getElementById('userReferralCode').textContent;
+    navigator.clipboard.writeText(referralCode).then(() => {
+        showNotification('Referral code copied to clipboard!', 'success');
+    });
+}
+
+function switchZedAITab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.zedai-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName).classList.add('active');
+    
+    // Update tab buttons
+    document.querySelectorAll('.zedai-tabs .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function switchInvestTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.invest-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName).classList.add('active');
+    
+    // Update tab buttons
+    document.querySelectorAll('.zedinvest-tabs .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function showAdminTab(tabName) {
+    // Hide all admin tab contents
+    document.querySelectorAll('.admin-tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Show selected tab
+    const targetTab = document.getElementById(`admin-${tabName}`);
+    if (targetTab) {
+        targetTab.style.display = 'block';
+    }
+    
+    // Update tab buttons
+    document.querySelectorAll('.admin-tab').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Load tab-specific data
+    switch(tabName) {
+        case 'overview':
+            loadAdminData();
+            break;
+        case 'users':
+            // Load users data
+            break;
+        case 'jobs':
+            // Load jobs data
+            break;
+        case 'payments':
+            // Load payments data
+            break;
+        case 'referrals':
+            // Load referrals data
+            break;
+        case 'trading':
+            // Load trading data
+            break;
+    }
+}
+
 // Initialize admin login form handler
 document.addEventListener('DOMContentLoaded', () => {
     const adminForm = document.getElementById('adminLoginForm');
