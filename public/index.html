@@ -830,6 +830,148 @@
         </div>
     </div>
 
+    <!-- ZedInvest Modal -->
+    <div id="zedinvestModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>ZedInvest</h2>
+                <p>Invest in small Zambian businesses</p>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="zedinvest-tabs">
+                    <button class="tab-btn active" onclick="switchInvestTab('businesses')">Available Businesses</button>
+                    <button class="tab-btn" onclick="switchInvestTab('portfolio')">My Investments</button>
+                </div>
+                
+                <div id="businesses" class="invest-tab-content active">
+                    <div class="business-grid">
+                        <div class="business-card">
+                            <h4>Lusaka Tech Solutions</h4>
+                            <p>Software development company</p>
+                            <div class="business-stats">
+                                <span>Expected Return: 12%</span>
+                                <span>Min Investment: K100</span>
+                            </div>
+                            <button class="btn btn-primary">Invest Now</button>
+                        </div>
+                        <div class="business-card">
+                            <h4>Kitwe Agriculture Co.</h4>
+                            <p>Organic farming and produce</p>
+                            <div class="business-stats">
+                                <span>Expected Return: 8%</span>
+                                <span>Min Investment: K50</span>
+                            </div>
+                            <button class="btn btn-primary">Invest Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="portfolio" class="invest-tab-content">
+                    <h3>Your Investment Portfolio</h3>
+                    <div class="portfolio-summary">
+                        <div class="stat-card">
+                            <h4>Total Invested</h4>
+                            <span>K0.00</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Current Value</h4>
+                            <span>K0.00</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Total Returns</h4>
+                            <span>K0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flutterwave Payment Modal -->
+    <div id="flutterwaveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Funds</h2>
+                <p>Add money to your ZED HUSTLE wallet</p>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-options">
+                    <div class="payment-method">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>MTN Money</h4>
+                        <p>Pay with MTN Mobile Money</p>
+                        <button class="btn btn-primary">Select</button>
+                    </div>
+                    <div class="payment-method">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>Airtel Money</h4>
+                        <p>Pay with Airtel Money</p>
+                        <button class="btn btn-primary">Select</button>
+                    </div>
+                    <div class="payment-method">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>Zamtel Kwacha</h4>
+                        <p>Pay with Zamtel Kwacha</p>
+                        <button class="btn btn-primary">Select</button>
+                    </div>
+                </div>
+                
+                <div class="amount-selection">
+                    <label>Amount to Add</label>
+                    <select id="amountSelect">
+                        <option value="50">K50</option>
+                        <option value="100">K100</option>
+                        <option value="200">K200</option>
+                        <option value="500">K500</option>
+                        <option value="1000">K1,000</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-primary">Proceed to Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Upgrade Modal -->
+    <div id="premiumUpgradeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upgrade to Premium</h2>
+                <p>Unlock ZedAI and premium features</p>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="premium-plans">
+                    <div class="plan-card">
+                        <h3>K50 Plan</h3>
+                        <ul>
+                            <li>150 bids/month</li>
+                            <li>Standard support</li>
+                            <li>Basic features</li>
+                        </ul>
+                        <button class="btn btn-outline">Select Plan</button>
+                    </div>
+                    <div class="plan-card featured">
+                        <h3>K100 Plan</h3>
+                        <div class="badge">Most Popular</div>
+                        <ul>
+                            <li>300 bids/month</li>
+                            <li>ZedAI Assistant</li>
+                            <li>Video profile uploads</li>
+                            <li>Priority applications</li>
+                            <li>24/7 support</li>
+                        </ul>
+                        <button class="btn btn-primary">Select Plan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Dashboard Modal -->
     <div id="adminDashboardModal" class="modal">
         <div class="modal-content admin-dashboard-modal">
@@ -1036,6 +1178,9 @@
 
 
     
+    <!-- Notification Element -->
+    <div id="notification" class="notification"></div>
+
     <!-- App Script -->
     <script src="script.js"></script>
 </body>

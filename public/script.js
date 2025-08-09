@@ -76,8 +76,15 @@ const ADMIN_PASSWORD_HASH = 'ZedHustle2024!'; // In production, this should be p
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-    initializeAdminAccess();
+    try {
+        console.log('🚀 ZED HUSTLE Platform Initializing...');
+        initializeApp();
+        initializeAdminAccess();
+        console.log('✅ ZED HUSTLE Platform Ready!');
+    } catch (error) {
+        console.error('❌ Error initializing ZED HUSTLE Platform:', error);
+        showNotification('Platform initialization error. Please refresh the page.', 'error');
+    }
 });
 
 async function initializeApp() {
