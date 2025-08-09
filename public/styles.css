@@ -776,16 +776,16 @@ body {
     }
     
     .hero-stats {
-        gap: 1.5rem;
-    }
-    
+    gap: 1.5rem;
+}
+
     .stat-number {
         font-size: 1.75rem;
     }
     
     .feature-card,
     .job-card {
-        padding: 1.5rem;
+    padding: 1.5rem;
     }
     
     .modal-header,
@@ -1457,4 +1457,4 @@ body {
 @media print {
     .navbar, .footer, .modal, .notification { display: none; }
     .hero { padding-top: 0; }
-}
+} 

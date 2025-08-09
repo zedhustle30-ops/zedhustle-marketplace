@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Signup button found:', !!signupBtn);
         console.log('Signup modal found:', !!signupModal);
         
-        initializeApp();
+    initializeApp();
         initializeAdminAccess();
         console.log('✅ ZED HUSTLE Platform Ready!');
     } catch (error) {
@@ -340,22 +340,32 @@ function updateAuthUI() {
     const userName = document.getElementById('userName');
     
     if (currentUser) {
-        loginBtn.style.display = 'none';
-        signupBtn.style.display = 'none';
-        userMenu.style.display = 'block';
-        userName.textContent = currentUser.fullName;
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (signupBtn) signupBtn.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'block';
         
-        // Show dashboard
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('jobs').style.display = 'none';
+        // Handle both Supabase and localStorage user name formats
+        const displayName = currentUser.fullName || currentUser.full_name || currentUser.email || 'User';
+        if (userName) userName.textContent = displayName;
+        
+        // Show dashboard and load user data
+        const dashboard = document.getElementById('dashboard');
+        const jobs = document.getElementById('jobs');
+        if (dashboard) dashboard.style.display = 'block';
+        if (jobs) jobs.style.display = 'none';
+        
+        // Load dashboard data
+        loadUserDashboard();
     } else {
-        loginBtn.style.display = 'block';
-        signupBtn.style.display = 'block';
-        userMenu.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (signupBtn) signupBtn.style.display = 'block';
+        if (userMenu) userMenu.style.display = 'none';
         
         // Hide dashboard
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('jobs').style.display = 'block';
+        const dashboard = document.getElementById('dashboard');
+        const jobs = document.getElementById('jobs');
+        if (dashboard) dashboard.style.display = 'none';
+        if (jobs) jobs.style.display = 'block';
     }
 }
 
@@ -467,12 +477,29 @@ function updateUser() {
 function loadUserDashboard() {
     if (!currentUser) return;
     
+    console.log('Loading dashboard for user:', currentUser);
+    
+    // Handle both Supabase schema and localStorage schema
+    const bids = currentUser.bids || 0;
+    const wallet = currentUser.wallet || 0;
+    const plan = currentUser.plan || (currentUser.is_premium ? 'Premium' : 'Free');
+    const referralEarnings = currentUser.referralEarnings || currentUser.referral_earnings || 0;
+    const referralCode = currentUser.referralCode || currentUser.referral_code || 'N/A';
+    
     // Update stats
-    document.getElementById('userBids').textContent = currentUser.bids || 0;
-    document.getElementById('userWallet').textContent = `K${(currentUser.wallet || 0).toFixed(2)}`;
-    document.getElementById('userPlan').textContent = currentUser.plan || 'Free';
-    document.getElementById('userReferralEarnings').textContent = `K${(currentUser.referralEarnings || 0).toFixed(2)}`;
-    document.getElementById('userReferralCode').textContent = currentUser.referralCode || 'N/A';
+    const userBidsEl = document.getElementById('userBids');
+    const userWalletEl = document.getElementById('userWallet');
+    const userPlanEl = document.getElementById('userPlan');
+    const userReferralEarningsEl = document.getElementById('userReferralEarnings');
+    const userReferralCodeEl = document.getElementById('userReferralCode');
+    
+    if (userBidsEl) userBidsEl.textContent = bids;
+    if (userWalletEl) userWalletEl.textContent = `K${wallet.toFixed(2)}`;
+    if (userPlanEl) userPlanEl.textContent = plan;
+    if (userReferralEarningsEl) userReferralEarningsEl.textContent = `K${referralEarnings.toFixed(2)}`;
+    if (userReferralCodeEl) userReferralCodeEl.textContent = referralCode;
+    
+    console.log('Dashboard updated with:', { bids, wallet, plan, referralEarnings, referralCode });
 }
 
 function switchTab(tabName) {
@@ -513,12 +540,12 @@ function loadApplications() {
             <h4>Web Developer Position</h4>
             <p>Status: <span class="status pending">Pending</span></p>
             <p>Applied: 2 days ago</p>
-        </div>
+                </div>
         <div class="application-item">
             <h4>Graphic Designer Role</h4>
             <p>Status: <span class="status approved">Approved</span></p>
             <p>Applied: 1 week ago</p>
-        </div>
+                </div>
     `;
 }
 
@@ -529,7 +556,7 @@ function loadMessages() {
             <h4>Welcome to ZED HUSTLE!</h4>
             <p>Thank you for joining our platform. Start applying for jobs today!</p>
             <small>Admin • 1 day ago</small>
-        </div>
+            </div>
     `;
 }
 
