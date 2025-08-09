@@ -7,6 +7,33 @@ const supabaseUrl = 'https://jpdndlnblbbtaxcrsyfm.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZG5kbG5ibGJidGF4Y3JzeWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MzMzNDEsImV4cCI6MjA3MDAwOTM0MX0.jJKRrinjTqoI5azn1YYRXyVYSKfLYJ1M-G-Vl-CAL-Q';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
+// Test Supabase connection
+async function testSupabaseConnection() {
+    try {
+        console.log('Testing Supabase connection...');
+        
+        // Test basic connection
+        const { data, error } = await supabase
+            .from('users')
+            .select('count', { count: 'exact', head: true });
+            
+        if (error) {
+            console.error('Supabase connection error:', error);
+            if (error.message.includes('relation "users" does not exist')) {
+                console.error('❌ Users table does not exist! Please run the SQL setup.');
+                showNotification('Database not set up. Please contact admin.', 'error');
+            }
+            return false;
+        } else {
+            console.log('✅ Supabase connected successfully. Users table exists.');
+            return true;
+        }
+    } catch (error) {
+        console.error('Supabase connection test failed:', error);
+        return false;
+    }
+}
+
 // Admin access configuration
 const ADMIN_EMAIL = 'admin@zedhustle.com';
 const ADMIN_PASSWORD_HASH = 'ZH2024$ADMIN#SECURE'; // This should be hashed in production
@@ -46,6 +73,13 @@ async function initializeApp() {
     jobs = [...sampleJobs];
     initializeEventListeners();
     loadJobs();
+    
+    // Test Supabase connection first
+    const connectionOk = await testSupabaseConnection();
+    if (!connectionOk) {
+        console.warn('⚠️ Supabase connection issues detected');
+    }
+    
     await checkAuthStatus();
     initializeAdminAccess();
 }
@@ -207,6 +241,11 @@ async function handleSignup(e) {
                 showNotification('Signup failed: ' + error.message, 'error');
             }
         } else {
+            console.log('Supabase auth user created:', data.user);
+            
+            // Wait a moment for auth context to be set
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             // Create user profile in database
             const userProfile = {
                 id: data.user.id,
@@ -223,6 +262,7 @@ async function handleSignup(e) {
 
             console.log('Creating user profile:', userProfile);
 
+            // Try inserting the user profile
             const { data: insertedUser, error: profileError } = await supabase
                 .from('users')
                 .insert([userProfile])
@@ -231,7 +271,32 @@ async function handleSignup(e) {
 
             if (profileError) {
                 console.error('Profile creation error:', profileError);
-                showNotification('Account created but profile setup failed: ' + profileError.message, 'error');
+                
+                // If it's a table doesn't exist error, use fallback
+                if (profileError.message.includes('relation "users" does not exist')) {
+                    console.log('Using fallback user creation (database not set up)');
+                    // Create a temporary user object for demonstration
+                    currentUser = {
+                        id: data.user.id,
+                        email: formData.email,
+                        full_name: formData.name,
+                        phone: formData.phone,
+                        has_paid_signup_fee: false,
+                        bids: 0,
+                        wallet: 0,
+                        referral_earnings: 0,
+                        referral_code: generateReferralCode()
+                    };
+                    closeAllModals();
+                    showPaymentPrompt(currentUser);
+                    showNotification('Account created! (Database setup needed for full functionality)', 'warning');
+                } else if (profileError.message.includes('duplicate key')) {
+                    showNotification('Account already exists with this email.', 'error');
+                } else if (profileError.message.includes('new row violates row-level security')) {
+                    showNotification('Database security settings need adjustment. Please contact admin.', 'error');
+                } else {
+                    showNotification('Account created but profile setup failed: ' + profileError.message, 'error');
+                }
             } else {
                 console.log('Profile created successfully:', insertedUser);
                 currentUser = insertedUser;

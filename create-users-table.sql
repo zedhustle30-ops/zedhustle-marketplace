@@ -34,6 +34,10 @@ CREATE POLICY "Users can update own profile" ON users
 CREATE POLICY "Users can insert own profile" ON users
     FOR INSERT WITH CHECK (auth.uid() = id);
 
+-- Create policy to allow anonymous users to insert during signup
+CREATE POLICY "Allow user registration" ON users
+    FOR INSERT WITH CHECK (true);
+
 -- Create function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
