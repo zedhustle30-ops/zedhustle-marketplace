@@ -1,11 +1,14 @@
-// Import Supabase client
-import { supabase } from '../lib/supabaseClient.js';
+// Initialize Supabase
+const SUPABASE_URL = 'https://jpdndlnblbbtaxcrsyfm.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZG5kbG5ibGJidGF4Y3JzeWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MzMzNDEsImV4cCI6MjA3MDAwOTM0MX0.jJKRrinjTqoI5azn1YYRXyVYSKfLYJ1M-G-Vl-CAL-Q';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Global variables
 let currentUser = null;
 let jobs = [];
 
-// Sample jobs data (will be loaded from Supabase)
+// Sample jobs data
 const sampleJobs = [
     {
         id: 1,
@@ -81,6 +84,13 @@ const ADMIN_PASSWORD_HASH = 'ZedHustle2024!'; // In production, this should be p
 document.addEventListener('DOMContentLoaded', function() {
     try {
         console.log('🚀 ZED HUSTLE Platform Initializing...');
+        
+        // Check if elements exist
+        const signupBtn = document.getElementById('signupBtn');
+        const signupModal = document.getElementById('signupModal');
+        console.log('Signup button found:', !!signupBtn);
+        console.log('Signup modal found:', !!signupModal);
+        
         initializeApp();
         initializeAdminAccess();
         console.log('✅ ZED HUSTLE Platform Ready!');
@@ -101,9 +111,35 @@ async function initializeApp() {
 
 function initializeEventListeners() {
     // Navigation
-    document.getElementById('loginBtn')?.addEventListener('click', () => showModal('loginModal'));
-    document.getElementById('signupBtn')?.addEventListener('click', () => showModal('signupModal'));
-    document.getElementById('getStartedBtn')?.addEventListener('click', () => showModal('signupModal'));
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const getStartedBtn = document.getElementById('getStartedBtn');
+    
+    console.log('Setting up event listeners...');
+    console.log('Login button:', !!loginBtn);
+    console.log('Signup button:', !!signupBtn);
+    console.log('Get Started button:', !!getStartedBtn);
+    
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            console.log('Login button clicked');
+            showModal('loginModal');
+        });
+    }
+    
+    if (signupBtn) {
+        signupBtn.addEventListener('click', () => {
+            console.log('Signup button clicked');
+            showModal('signupModal');
+        });
+    }
+    
+    if (getStartedBtn) {
+        getStartedBtn.addEventListener('click', () => {
+            console.log('Get Started button clicked');
+            showModal('signupModal');
+        });
+    }
     
     // Modal controls
     document.querySelectorAll('.close').forEach(closeBtn => {
@@ -151,21 +187,35 @@ async function handleLogin(e) {
     
     if (email && password) {
         try {
-            // Check if user exists in localStorage
-            const users = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('zedHustleCurrentUser', JSON.stringify(user));
+            // Try Supabase users table lookup
+            const { data: users, error: userError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', email)
+                .eq('password', password) // In production, use proper password hashing
+                .single();
                 
-                closeAllModals();
-                showNotification('Login successful!', 'success');
-                updateAuthUI();
-                loadUserDashboard();
+            if (userError || !users) {
+                // Fallback to localStorage for local testing
+                const localUsers = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
+                const localUser = localUsers.find(u => u.email === email && u.password === password);
+                
+                if (localUser) {
+                    currentUser = localUser;
+                } else {
+                    showNotification('Invalid email or password', 'error');
+                    return;
+                }
             } else {
-                showNotification('Invalid email or password', 'error');
+                currentUser = users;
             }
+            
+            localStorage.setItem('zedHustleCurrentUser', JSON.stringify(currentUser));
+            closeAllModals();
+            showNotification('Login successful!', 'success');
+            updateAuthUI();
+            loadUserDashboard();
+            
         } catch (error) {
             console.error('Login error:', error);
             showNotification('Login failed. Please try again.', 'error');
@@ -183,45 +233,68 @@ async function handleSignup(e) {
     
     if (email && password && fullName) {
         try {
-            // Check if user already exists
-            const users = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
-            const existingUser = users.find(u => u.email === email);
-            
-            if (existingUser) {
+            // Check if user already exists in Supabase
+            const { data: existingUsers, error: checkError } = await supabase
+                .from('users')
+                .select('email')
+                .eq('email', email);
+                
+            if (existingUsers && existingUsers.length > 0) {
                 showNotification('Account with this email already exists', 'error');
                 return;
             }
             
-            // Create new user
+            // Create new user in Supabase
             const newUser = {
-                id: Date.now().toString(),
+                full_name: fullName,
                 email: email,
                 password: password, // In production, this should be hashed
-                fullName: fullName,
                 phone: phone,
                 bids: 50, // Free bids on signup
                 wallet: 0,
-                plan: 'free',
-                referralEarnings: 0,
-                referralCode: generateReferralCode(),
-                createdAt: new Date().toISOString(),
-                tokens: {
-                    copper: 0,
-                    gold: 0,
-                    maize: 0,
-                    oil: 0,
-                    mealieMeal: 0
-                },
-                trades: [],
-                investments: []
+                referral_earnings: 0,
+                referral_code: generateReferralCode(),
+                is_premium: false,
+                premium_tier: null,
+                portfolio: [],
+                achievements: [],
+                has_paid_signup_fee: false
             };
             
-            users.push(newUser);
-            localStorage.setItem('zedHustleUsers', JSON.stringify(users));
+            const { data: insertedUser, error: insertError } = await supabase
+                .from('users')
+                .insert([newUser])
+                .select()
+                .single();
+                
+            if (insertError) {
+                console.error('Supabase insert error:', insertError);
+                // Fallback to localStorage
+                const users = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
+                const localUser = {
+                    id: Date.now().toString(),
+                    email: email,
+                    password: password,
+                    fullName: fullName,
+                    phone: phone,
+                    bids: 50,
+                    wallet: 0,
+                    plan: 'free',
+                    referralEarnings: 0,
+                    referralCode: generateReferralCode(),
+                    createdAt: new Date().toISOString(),
+                    tokens: { copper: 0, gold: 0, maize: 0, oil: 0, mealieMeal: 0 },
+                    trades: [],
+                    investments: []
+                };
+                users.push(localUser);
+                localStorage.setItem('zedHustleUsers', JSON.stringify(users));
+                currentUser = localUser;
+            } else {
+                currentUser = insertedUser;
+            }
             
-            currentUser = newUser;
-            localStorage.setItem('zedHustleCurrentUser', JSON.stringify(newUser));
-            
+            localStorage.setItem('zedHustleCurrentUser', JSON.stringify(currentUser));
             closeAllModals();
             showNotification('Account created successfully! You received 50 free bids.', 'success');
             updateAuthUI();
@@ -287,9 +360,39 @@ function updateAuthUI() {
 }
 
 // Job Functions
-function loadJobs() {
+async function loadJobs() {
     const jobsList = document.getElementById('jobsList');
     if (!jobsList) return;
+    
+    try {
+        // Try to load jobs from Supabase
+        const { data: supabaseJobs, error } = await supabase
+            .from('jobs')
+            .select('*')
+            .eq('status', 'active');
+            
+        if (error) {
+            console.log('Using sample jobs, Supabase error:', error.message);
+            jobs = [...sampleJobs]; // Fallback to sample data
+        } else if (supabaseJobs && supabaseJobs.length > 0) {
+            jobs = supabaseJobs.map(job => ({
+                id: job.id,
+                title: job.title,
+                company: job.company || 'Company',
+                salary: job.salary || 'Negotiable',
+                description: job.description,
+                category: job.category,
+                location: job.location,
+                tags: job.tags || [],
+                bidsRequired: job.bids_required || 5
+            }));
+        } else {
+            jobs = [...sampleJobs]; // Fallback to sample data
+        }
+    } catch (error) {
+        console.error('Error loading jobs:', error);
+        jobs = [...sampleJobs]; // Fallback to sample data
+    }
     
     jobsList.innerHTML = jobs.map(job => `
         <div class="job-card" data-category="${job.category}" data-location="${job.location}">
@@ -724,10 +827,17 @@ function loadAdminData() {
 
 // Modal Functions
 function showModal(modalId) {
-    closeAllModals();
+    console.log('showModal called with:', modalId);
     const modal = document.getElementById(modalId);
+    console.log('Modal found:', !!modal);
+    
+    closeAllModals();
+    
     if (modal) {
         modal.style.display = 'block';
+        console.log('Modal displayed:', modalId);
+    } else {
+        console.error('Modal not found:', modalId);
     }
 }
 
