@@ -8,7 +8,8 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🚀 ZED HUSTLE - GitHub + Vercel Setup Helper\n');
+console.log('🚀 ZED HUSTLE - GitHub + Vercel Setup Helper');
+console.log('📋 Supabase Project: ZED HUSTLE (jpdndlnblbbtaxcrsyfm)\n');
 
 // Check if we're in the right directory
 if (!fs.existsSync('public/index.html')) {

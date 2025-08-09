@@ -9,7 +9,8 @@
 
 ## 🗄️ **Step 1: Set Up Supabase Database**
 
-### **1.1 Go to your Supabase project dashboard**
+### **1.1 Go to your ZED HUSTLE Supabase project**
+- Project Name: **ZED HUSTLE**
 - URL: `https://supabase.com/dashboard/project/jpdndlnblbbtaxcrsyfm`
 
 ### **1.2 Run the database setup**

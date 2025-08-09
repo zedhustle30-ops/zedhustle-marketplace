@@ -9,7 +9,7 @@ Your ZED HUSTLE platform is fully configured for Supabase + Vercel deployment!
 ## 🎯 **Quick Steps to Deploy:**
 
 ### **1. Set Up Supabase Database (5 minutes)**
-1. **Go to**: [supabase.com/dashboard/project/jpdndlnblbbtaxcrsyfm](https://supabase.com/dashboard/project/jpdndlnblbbtaxcrsyfm)
+1. **Go to your ZED HUSTLE project**: [supabase.com/dashboard/project/jpdndlnblbbtaxcrsyfm](https://supabase.com/dashboard/project/jpdndlnblbbtaxcrsyfm)
 2. **Click**: SQL Editor
 3. **Copy & Paste**: All content from `supabase-schema.sql`
 4. **Click**: "Run" to create database tables
