@@ -13,21 +13,16 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <i class="fas fa-rocket"></i>
-                <span>ZED HUSTLE</span>
+                <span class="logo-text">ZED HUSTLE</span>
             </div>
             <div class="nav-menu" id="nav-menu">
-                <a href="#home" class="nav-link">Home</a>
-                <a href="#jobs" class="nav-link">Jobs</a>
-                <a href="#trading" class="nav-link">Trading</a>
-                <a href="#zedai" class="nav-link">ZedAI</a>
-                <a href="#about" class="nav-link">About</a>
-                <a href="#contact" class="nav-link">Contact</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
             </div>
             <div class="nav-auth">
-                <button class="btn btn-outline" id="loginBtn">Login</button>
-                <button class="btn btn-primary" id="signupBtn">Sign Up</button>
-                <button class="btn btn-danger" id="adminLoginBtn" title="Admin Access" style="margin-left: 10px; font-size: 1.2rem; padding: 8px 12px; background: #dc2626; border: 2px solid #dc2626;">🔒</button>
+                <button class="btn btn-outline" id="loginBtn">Sign In</button>
+                <button class="btn btn-primary" id="signupBtn">Get Started</button>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -41,39 +36,37 @@
     <main>
         <!-- Hero Section -->
         <section id="home" class="hero">
+            <!-- Top Banner -->
+            <div class="hero-banner">
+                <span class="banner-text">🇿🇲 Proudly Zambian • Join 10,000+ Users</span>
+            </div>
+            
             <div class="hero-container">
                 <div class="hero-content">
-                    <h1 class="hero-title">Your Gateway to <span class="highlight">Freelance Success</span></h1>
-                    <p class="hero-subtitle">Join Zambia's premier freelance marketplace. Find jobs, trade commodities, and build your career with our innovative bidding system.</p>
+                    <h1 class="hero-title">Earn Money with<br><span class="highlight">ZED HUSTLE</span></h1>
+                    <p class="hero-subtitle">Zambia's premier platform combining freelancing, commodity trading, and micro-investments. Start earning from K50 to K1,500+ per project today.</p>
+                    
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary btn-large" id="getStartedBtn">
+                            <span>Start Earning Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Stats Row -->
                     <div class="hero-stats">
                         <div class="stat">
-                            <span class="stat-number">500+</span>
-                            <span class="stat-label">Active Jobs</span>
+                            <span class="stat-number">50+</span>
+                            <span class="stat-label">Free Bids</span>
                         </div>
                         <div class="stat">
-                            <span class="stat-number">2,000+</span>
-                            <span class="stat-label">Freelancers</span>
+                            <span class="stat-number">K1,500+</span>
+                            <span class="stat-label">Max Earnings</span>
                         </div>
                         <div class="stat">
-                            <span class="stat-number">K500K+</span>
-                            <span class="stat-label">Paid Out</span>
+                            <span class="stat-number">24/7</span>
+                            <span class="stat-label">AI Support</span>
                         </div>
-                    </div>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary btn-large" id="getStartedBtn">Get Started</button>
-                        <button class="btn btn-outline btn-large" id="learnMoreBtn">Learn More</button>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <div class="floating-card">
-                        <i class="fas fa-briefcase"></i>
-                        <h3>Find Your Next Job</h3>
-                        <p>Browse thousands of opportunities</p>
-                    </div>
-                    <div class="floating-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Trade Commodities</h3>
-                        <p>Invest in Zambia's resources</p>
                     </div>
                 </div>
             </div>
@@ -781,9 +774,7 @@
     </footer>
 
 
-    
-    <!-- Trading Script -->
-    <script src="zedhustle-trading.js"></script>
+
     
     <!-- App Script -->
     <script src="script.js"></script>
