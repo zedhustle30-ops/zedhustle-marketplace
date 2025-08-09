@@ -25,51 +25,75 @@ const sampleJobs = [
         location: 'remote',
         tags: ['Adobe Creative Suite', 'Branding'],
         bidsRequired: 5
+    },
+    {
+        id: 3,
+        title: 'Content Writer for Blog',
+        company: 'Digital Marketing Co',
+        salary: 'K1,200 - K2,500',
+        description: 'Looking for engaging content writers for our blog and social media.',
+        category: 'writing',
+        location: 'remote',
+        tags: ['Content Writing', 'SEO', 'Social Media'],
+        bidsRequired: 5
+    },
+    {
+        id: 4,
+        title: 'Mobile App Developer',
+        company: 'StartupTech',
+        salary: 'K3,000 - K5,500',
+        description: 'Develop a mobile app for iOS and Android using React Native.',
+        category: 'mobile-development',
+        location: 'ndola',
+        tags: ['React Native', 'iOS', 'Android'],
+        bidsRequired: 10
+    },
+    {
+        id: 5,
+        title: 'Data Entry Specialist',
+        company: 'Business Solutions',
+        salary: 'K800 - K1,500',
+        description: 'Accurate data entry for customer records and inventory management.',
+        category: 'data-entry',
+        location: 'kitwe',
+        tags: ['Excel', 'Data Entry', 'Accuracy'],
+        bidsRequired: 5
     }
 ];
 
+// Sample commodities data for trading
+const sampleCommodities = [
+    { name: 'Copper', price: 8500, change: '+2.3%', symbol: 'CU' },
+    { name: 'Gold', price: 12800, change: '-0.8%', symbol: 'AU' },
+    { name: 'Maize', price: 450, change: '+1.2%', symbol: 'MZ' },
+    { name: 'Oil', price: 950, change: '+3.1%', symbol: 'OIL' },
+    { name: 'Mealie Meal', price: 280, change: '-0.5%', symbol: 'MM' }
+];
+
+// Admin credentials (for demo purposes)
+const ADMIN_EMAIL = 'admin@zedhustle.zm';
+const ADMIN_PASSWORD_HASH = 'ZedHustle2024!'; // In production, this should be properly hashed
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    testSupabaseConnection();
     initializeApp();
+    initializeAdminAccess();
 });
 
 async function initializeApp() {
     jobs = [...sampleJobs];
     initializeEventListeners();
-    await loadJobs();
-    await checkAuthStatus();
-}
-
-// Test Supabase connection
-async function testSupabaseConnection() {
-    try {
-        console.log('Testing Supabase connection...');
-        
-        // Test basic connection
-        const { data, error } = await window.supabaseClient
-            .from('commodities')
-            .select('*')
-            .limit(1);
-        
-        if (error) {
-            console.error('❌ Supabase connection failed:', error);
-            showNotification('Database connection failed. Please check your configuration.', 'error');
-        } else {
-            console.log('✅ Supabase connection successful!');
-            console.log('Sample data:', data);
-        }
-    } catch (error) {
-        console.error('❌ Supabase connection error:', error);
-        showNotification('Database connection error. Please check your configuration.', 'error');
-    }
+    loadJobs();
+    checkAuthStatus();
+    initializeTrading();
+    loadTradingDashboard();
 }
 
 function initializeEventListeners() {
     // Navigation
-    document.getElementById('loginBtn').addEventListener('click', () => showModal('loginModal'));
-    document.getElementById('signupBtn').addEventListener('click', () => showModal('signupModal'));
-    document.getElementById('getStartedBtn').addEventListener('click', () => showModal('signupModal'));
+    document.getElementById('loginBtn')?.addEventListener('click', () => showModal('loginModal'));
+    document.getElementById('signupBtn')?.addEventListener('click', () => showModal('signupModal'));
+    document.getElementById('getStartedBtn')?.addEventListener('click', () => showModal('signupModal'));
     
     // Modal controls
     document.querySelectorAll('.close').forEach(closeBtn => {
@@ -77,12 +101,35 @@ function initializeEventListeners() {
     });
     
     // Form submissions
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
-    document.getElementById('signupForm').addEventListener('submit', handleSignup);
+    document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+    document.getElementById('signupForm')?.addEventListener('submit', handleSignup);
     
     // Job filters
-    document.getElementById('categoryFilter').addEventListener('change', filterJobs);
-    document.getElementById('locationFilter').addEventListener('change', filterJobs);
+    document.getElementById('categoryFilter')?.addEventListener('change', filterJobs);
+    document.getElementById('locationFilter')?.addEventListener('change', filterJobs);
+    
+    // Dashboard tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => switchTab(e.target.dataset.tab));
+    });
+    
+    // Trading modal
+    document.getElementById('tradingBtn')?.addEventListener('click', showTradingModal);
+    document.getElementById('closeTradingModal')?.addEventListener('click', closeTradingModal);
+    
+    // ZedAI modal
+    document.getElementById('zedaiBtn')?.addEventListener('click', showZedAI);
+    
+    // ZedInvest modals
+    document.getElementById('zedinvestBtn')?.addEventListener('click', showZedInvest);
+    document.getElementById('businessModal')?.addEventListener('click', showBusinessModal);
+    document.getElementById('investmentHistoryModal')?.addEventListener('click', showInvestmentHistoryModal);
+    
+    // Payment modal
+    document.getElementById('paymentBtn')?.addEventListener('click', showFlutterwavePayment);
+    
+    // Offline jobs modal
+    document.getElementById('offlineJobsBtn')?.addEventListener('click', showOfflineJobPosting);
 }
 
 // Authentication Functions
@@ -94,326 +141,584 @@ async function handleLogin(e) {
     
     if (email && password) {
         try {
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+            // Check if user exists in localStorage
+            const users = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
             
-            if (error) {
-                showNotification('Login failed: ' + error.message, 'error');
-                return;
-            }
-            
-            // Get user profile from database
-            const { data: userProfile, error: profileError } = await window.supabaseClient
-                .from('users')
-                .select('*')
-                .eq('email', email)
-                .single();
-            
-            if (profileError) {
-                showNotification('Error loading user profile', 'error');
-                return;
-            }
-            
-            if (userProfile.has_paid_signup_fee) {
-                currentUser = userProfile;
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('zedHustleCurrentUser', JSON.stringify(user));
+                
                 closeAllModals();
-                updateUIForLoggedInUser();
                 showNotification('Login successful!', 'success');
+                updateAuthUI();
+                loadUserDashboard();
             } else {
-                showPaymentPrompt(userProfile);
+                showNotification('Invalid email or password', 'error');
             }
         } catch (error) {
-            showNotification('Login failed: ' + error.message, 'error');
+            console.error('Login error:', error);
+            showNotification('Login failed. Please try again.', 'error');
         }
-    } else {
-        showNotification('Please fill in all fields.', 'error');
     }
 }
 
 async function handleSignup(e) {
     e.preventDefault();
     
-    const formData = {
-        name: document.getElementById('signupName').value,
-        email: document.getElementById('signupEmail').value,
-        phone: document.getElementById('signupPhone').value,
-        password: document.getElementById('signupPassword').value,
-        referralCode: document.getElementById('referralCode').value
-    };
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const fullName = document.getElementById('signupName').value;
+    const phone = document.getElementById('signupPhone').value;
     
-    if (!formData.name || !formData.email || !formData.phone || !formData.password) {
-        showNotification('Please fill in all required fields.', 'error');
-        return;
+    if (email && password && fullName) {
+        try {
+            // Check if user already exists
+            const users = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
+            const existingUser = users.find(u => u.email === email);
+            
+            if (existingUser) {
+                showNotification('Account with this email already exists', 'error');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now().toString(),
+                email: email,
+                password: password, // In production, this should be hashed
+                fullName: fullName,
+                phone: phone,
+                bids: 50, // Free bids on signup
+                wallet: 0,
+                plan: 'free',
+                referralEarnings: 0,
+                referralCode: generateReferralCode(),
+                createdAt: new Date().toISOString(),
+                tokens: {
+                    copper: 0,
+                    gold: 0,
+                    maize: 0,
+                    oil: 0,
+                    mealieMeal: 0
+                },
+                trades: [],
+                investments: []
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('zedHustleUsers', JSON.stringify(users));
+            
+            currentUser = newUser;
+            localStorage.setItem('zedHustleCurrentUser', JSON.stringify(newUser));
+            
+            closeAllModals();
+            showNotification('Account created successfully! You received 50 free bids.', 'success');
+            updateAuthUI();
+            loadUserDashboard();
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            showNotification('Signup failed. Please try again.', 'error');
+        }
     }
-    
+}
+
+function generateReferralCode() {
+    return 'ZED' + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+async function logout() {
+    currentUser = null;
+    localStorage.removeItem('zedHustleCurrentUser');
+    updateAuthUI();
+    showNotification('Logged out successfully', 'success');
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('jobs').style.display = 'block';
+}
+
+async function checkAuthStatus() {
     try {
-        // Create user in Supabase Auth
-        const { data: authData, error: authError } = await window.supabaseClient.auth.signUp({
-            email: formData.email,
-            password: formData.password
-        });
-        
-        if (authError) {
-            showNotification('Signup failed: ' + authError.message, 'error');
-        return;
-    }
-    
-        // Create user profile in database
-    const newUser = {
-            email: formData.email,
-            name: formData.name,
-            phone: formData.phone,
-            has_paid_signup_fee: false,
-        bids: 0,
-        wallet: 0,
-            referral_earnings: 0,
-            referral_code: generateReferralCode()
-        };
-        
-        const { data: profileData, error: profileError } = await window.supabaseClient
-            .from('users')
-            .insert([newUser])
-            .select()
-            .single();
-        
-        if (profileError) {
-            showNotification('Error creating user profile: ' + profileError.message, 'error');
-            return;
+        const savedUser = localStorage.getItem('zedHustleCurrentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            updateAuthUI();
+            loadUserDashboard();
         }
-        
-        // Process referral if provided
-        if (formData.referralCode) {
-            await processReferral(formData.referralCode, profileData.id);
-        }
-        
-    closeAllModals();
-        showPaymentPrompt(profileData);
-        
     } catch (error) {
-        showNotification('Signup failed: ' + error.message, 'error');
+        console.error('Auth check error:', error);
     }
 }
 
-function showPaymentPrompt(user) {
-    const paymentModal = createPaymentModal(user);
-    document.body.appendChild(paymentModal);
-    setTimeout(() => paymentModal.style.display = 'flex', 100);
+function updateAuthUI() {
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const userMenu = document.getElementById('userMenu');
+    const userName = document.getElementById('userName');
+    
+    if (currentUser) {
+        loginBtn.style.display = 'none';
+        signupBtn.style.display = 'none';
+        userMenu.style.display = 'block';
+        userName.textContent = currentUser.fullName;
+        
+        // Show dashboard
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('jobs').style.display = 'none';
+    } else {
+        loginBtn.style.display = 'block';
+        signupBtn.style.display = 'block';
+        userMenu.style.display = 'none';
+        
+        // Hide dashboard
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('jobs').style.display = 'block';
+    }
 }
 
-function createPaymentModal(user) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.style.display = 'none';
+// Job Functions
+function loadJobs() {
+    const jobsList = document.getElementById('jobsList');
+    if (!jobsList) return;
     
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <h2>Complete Your Registration</h2>
-            <div class="payment-info">
-                <div class="payment-amount">
-                    <h3>Signup Fee: K30</h3>
-                    <p>After payment, you'll receive:</p>
-                    <ul>
-                        <li><i class="fas fa-check"></i> 50 bids for job applications</li>
-                        <li><i class="fas fa-check"></i> 1 week full access to all features</li>
-                        <li><i class="fas fa-check"></i> Ability to refer others and earn rewards</li>
-                    </ul>
-                </div>
-                <div class="payment-methods">
-                    <h4>Choose Payment Method:</h4>
-                    <button class="btn btn-primary payment-method" data-method="mobile-money">
-                        <i class="fas fa-mobile-alt"></i> Mobile Money
-                    </button>
-                    <button class="btn btn-outline payment-method" data-method="bank-transfer">
-                        <i class="fas fa-university"></i> Bank Transfer
-                    </button>
-                </div>
+    jobsList.innerHTML = jobs.map(job => `
+        <div class="job-card" data-category="${job.category}" data-location="${job.location}">
+            <h3>${job.title}</h3>
+            <p class="company">${job.company}</p>
+            <p class="salary">${job.salary}</p>
+            <p class="description">${job.description}</p>
+            <div class="job-tags">
+                ${job.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+            <div class="job-footer">
+                <span class="bids-required">${job.bidsRequired} bids required</span>
+                <button class="apply-btn" onclick="applyForJob(${job.id})">Apply Now</button>
             </div>
         </div>
-    `;
-    
-    modal.querySelectorAll('.payment-method').forEach(btn => {
-        btn.addEventListener('click', () => processPayment(user, btn.dataset.method));
-    });
-    
-    return modal;
-}
-
-function processPayment(user, method) {
-    showNotification(`Processing ${method} payment...`, 'info');
-    
-    setTimeout(() => {
-        user.hasPaidSignupFee = true;
-        user.bids = 50;
-        user.wallet = 0;
-        user.paymentMethod = method;
-        user.paymentDate = new Date().toISOString();
-        
-        saveUser(user);
-        
-        if (user.referralCode) {
-            processReferral(user.referralCode);
-        }
-        
-        currentUser = user;
-        updateUIForLoggedInUser();
-        document.querySelector('.modal').remove();
-        showNotification('Payment successful! Welcome to ZED HUSTLE!', 'success');
-    }, 2000);
-}
-
-// Job Management Functions
-async function loadJobs() {
-    const jobsGrid = document.getElementById('jobsGrid');
-    if (!jobsGrid) return;
-    
-    jobsGrid.innerHTML = '';
-    
-    try {
-        const { data: jobsData, error } = await window.supabaseClient
-            .from('jobs')
-            .select('*')
-            .eq('status', 'active')
-            .order('created_at', { ascending: false });
-        
-        if (error) {
-            console.error('Error loading jobs:', error);
-            // Fallback to sample jobs
-            jobs.forEach(job => {
-                const jobCard = createJobCard(job);
-                jobsGrid.appendChild(jobCard);
-            });
-            return;
-        }
-        
-        if (jobsData && jobsData.length > 0) {
-            jobsData.forEach(job => {
-                const jobCard = createJobCard(job);
-                jobsGrid.appendChild(jobCard);
-            });
-        } else {
-            // Show sample jobs if no jobs in database
-            jobs.forEach(job => {
-                const jobCard = createJobCard(job);
-                jobsGrid.appendChild(jobCard);
-            });
-        }
-    } catch (error) {
-        console.error('Error loading jobs:', error);
-        // Fallback to sample jobs
-    jobs.forEach(job => {
-        const jobCard = createJobCard(job);
-        jobsGrid.appendChild(jobCard);
-    });
-    }
-}
-
-function createJobCard(job) {
-    const card = document.createElement('div');
-    card.className = 'job-card';
-    
-    card.innerHTML = `
-        <div class="job-header">
-            <div>
-                <h3 class="job-title">${job.title}</h3>
-                <p class="job-company">${job.company}</p>
-            </div>
-            <span class="job-salary">${job.salary}</span>
-        </div>
-        <p class="job-description">${job.description}</p>
-        <div class="job-tags">
-            ${job.tags.map(tag => `<span class="job-tag">${tag}</span>`).join('')}
-        </div>
-        <button class="job-apply" onclick="applyForJob(${job.id})">
-            Apply (${job.bidsRequired} bid${job.bidsRequired > 1 ? 's' : ''})
-        </button>
-    `;
-    
-    return card;
-}
-
-async function applyForJob(jobId) {
-    if (!currentUser) {
-        showModal('loginModal');
-        return;
-    }
-    
-    try {
-        // Get job details from database
-        const { data: job, error: jobError } = await window.supabaseClient
-            .from('jobs')
-            .select('*')
-            .eq('id', jobId)
-            .single();
-        
-        if (jobError) {
-            showNotification('Error loading job details.', 'error');
-            return;
-        }
-        
-        if (currentUser.bids < job.bids_required) {
-            showNotification(`You need ${job.bids_required} bid(s) to apply for this job.`, 'error');
-            return;
-        }
-        
-        // Create job application
-        const { error: applicationError } = await window.supabaseClient
-            .from('job_applications')
-            .insert([{
-                job_id: jobId,
-                user_id: currentUser.id,
-                bid_amount: job.bids_required
-            }]);
-        
-        if (applicationError) {
-            showNotification('Error applying for job: ' + applicationError.message, 'error');
-            return;
-        }
-        
-        // Update user bids
-        const { error: updateError } = await window.supabaseClient
-            .from('users')
-            .update({ bids: currentUser.bids - job.bids_required })
-            .eq('id', currentUser.id);
-        
-        if (updateError) {
-            showNotification('Error updating bids: ' + updateError.message, 'error');
-        return;
-    }
-    
-        // Update local user object
-        currentUser.bids -= job.bids_required;
-    updateUserStats();
-    showNotification(`Successfully applied for "${job.title}"!`, 'success');
-        
-    } catch (error) {
-        showNotification('Error applying for job: ' + error.message, 'error');
-    }
+    `).join('');
 }
 
 function filterJobs() {
-    const category = document.getElementById('categoryFilter').value;
-    const location = document.getElementById('locationFilter').value;
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    const locationFilter = document.getElementById('locationFilter').value;
     
-    let filteredJobs = sampleJobs;
+    const jobCards = document.querySelectorAll('.job-card');
     
-    if (category) {
-        filteredJobs = filteredJobs.filter(job => job.category === category);
-    }
-    
-    if (location) {
-        filteredJobs = filteredJobs.filter(job => job.location === location);
-    }
-    
-    jobs = filteredJobs;
-    loadJobs();
+    jobCards.forEach(card => {
+        const category = card.dataset.category;
+        const location = card.dataset.location;
+        
+        const categoryMatch = !categoryFilter || category === categoryFilter;
+        const locationMatch = !locationFilter || location === locationFilter;
+        
+        card.style.display = (categoryMatch && locationMatch) ? 'block' : 'none';
+    });
 }
 
-// Utility Functions
+function applyForJob(jobId) {
+    if (!currentUser) {
+        showModal('loginModal');
+        showNotification('Please login to apply for jobs', 'info');
+        return;
+    }
+    
+    const job = jobs.find(j => j.id === jobId);
+    if (!job) return;
+    
+    if (currentUser.bids < job.bidsRequired) {
+        showNotification(`You need ${job.bidsRequired} bids to apply for this job. You have ${currentUser.bids} bids.`, 'error');
+        return;
+    }
+    
+    // Deduct bids
+    currentUser.bids -= job.bidsRequired;
+    updateUser();
+    
+    showNotification(`Applied successfully! ${job.bidsRequired} bids deducted.`, 'success');
+    loadUserDashboard();
+}
+
+function updateUser() {
+    localStorage.setItem('zedHustleCurrentUser', JSON.stringify(currentUser));
+    
+    // Update in users array
+    const users = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    if (userIndex !== -1) {
+        users[userIndex] = currentUser;
+        localStorage.setItem('zedHustleUsers', JSON.stringify(users));
+    }
+}
+
+// Dashboard Functions
+function loadUserDashboard() {
+    if (!currentUser) return;
+    
+    // Update stats
+    document.getElementById('userBids').textContent = currentUser.bids || 0;
+    document.getElementById('userWallet').textContent = `K${(currentUser.wallet || 0).toFixed(2)}`;
+    document.getElementById('userPlan').textContent = currentUser.plan || 'Free';
+    document.getElementById('userReferralEarnings').textContent = `K${(currentUser.referralEarnings || 0).toFixed(2)}`;
+    document.getElementById('userReferralCode').textContent = currentUser.referralCode || 'N/A';
+}
+
+function switchTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName).style.display = 'block';
+    
+    // Add active class to clicked button
+    event.target.classList.add('active');
+    
+    // Load tab-specific data
+    switch(tabName) {
+        case 'applications':
+            loadApplications();
+            break;
+        case 'messages':
+            loadMessages();
+            break;
+        case 'notifications':
+            loadNotifications();
+            break;
+    }
+}
+
+function loadApplications() {
+    const applicationsList = document.getElementById('applicationsList');
+    applicationsList.innerHTML = `
+        <div class="application-item">
+            <h4>Web Developer Position</h4>
+            <p>Status: <span class="status pending">Pending</span></p>
+            <p>Applied: 2 days ago</p>
+        </div>
+        <div class="application-item">
+            <h4>Graphic Designer Role</h4>
+            <p>Status: <span class="status approved">Approved</span></p>
+            <p>Applied: 1 week ago</p>
+        </div>
+    `;
+}
+
+function loadMessages() {
+    const messagesList = document.getElementById('messagesList');
+    messagesList.innerHTML = `
+        <div class="message-item">
+            <h4>Welcome to ZED HUSTLE!</h4>
+            <p>Thank you for joining our platform. Start applying for jobs today!</p>
+            <small>Admin • 1 day ago</small>
+        </div>
+    `;
+}
+
+function loadNotifications() {
+    const notificationsList = document.getElementById('notificationsList');
+    notificationsList.innerHTML = `
+        <div class="notification-item">
+            <h4>Application Status Update</h4>
+            <p>Your application for "Web Developer" has been viewed by the employer.</p>
+            <small>2 hours ago</small>
+        </div>
+    `;
+}
+
+// Trading Functions
+function initializeTrading() {
+    // Update commodity prices periodically (simulate real-time updates)
+    setInterval(updateCommodityPrices, 30000); // Update every 30 seconds
+    updateCommodityPrices(); // Initial update
+}
+
+function updateCommodityPrices() {
+    sampleCommodities.forEach(commodity => {
+        // Simulate price changes (-5% to +5%)
+        const changePercent = (Math.random() - 0.5) * 0.1;
+        commodity.price = Math.round(commodity.price * (1 + changePercent));
+        commodity.change = (changePercent >= 0 ? '+' : '') + (changePercent * 100).toFixed(1) + '%';
+    });
+}
+
+function showTradingModal() {
+    const modal = document.getElementById('tradingModal');
+    if (modal) {
+        modal.style.display = 'block';
+        loadTradingModalData();
+    }
+}
+
+function loadTradingModalData() {
+    const commoditiesList = document.getElementById('commoditiesList');
+    if (!commoditiesList) return;
+    
+    commoditiesList.innerHTML = sampleCommodities.map(commodity => `
+        <div class="commodity-item">
+            <div class="commodity-info">
+                <h4>${commodity.name} (${commodity.symbol})</h4>
+                <p class="price">K${commodity.price}</p>
+                <p class="change ${commodity.change.startsWith('+') ? 'positive' : 'negative'}">${commodity.change}</p>
+            </div>
+            <div class="commodity-actions">
+                <input type="number" id="amount-${commodity.symbol}" placeholder="Amount" min="1" max="100" value="1">
+                <button onclick="executeTrade('${commodity.symbol}', 'buy')" class="buy-btn">Buy</button>
+                <button onclick="executeTrade('${commodity.symbol}', 'sell')" class="sell-btn">Sell</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function executeTrade(symbol, action) {
+    if (!currentUser) {
+        showNotification('Please login to trade', 'error');
+        return;
+    }
+    
+    const amountInput = document.getElementById(`amount-${symbol}`);
+    const amount = parseInt(amountInput.value) || 1;
+    
+    const commodity = sampleCommodities.find(c => c.symbol === symbol);
+    if (!commodity) return;
+    
+    if (action === 'buy') {
+        const totalCost = (commodity.price + 10) * amount; // +10 buying fee per token
+        
+        if (currentUser.wallet < totalCost) {
+            showNotification(`Insufficient funds. You need K${totalCost} but have K${currentUser.wallet}`, 'error');
+            return;
+        }
+        
+        currentUser.wallet -= totalCost;
+        currentUser.tokens[symbol.toLowerCase()] = (currentUser.tokens[symbol.toLowerCase()] || 0) + amount;
+        
+        // Add to trade history
+        if (!currentUser.trades) currentUser.trades = [];
+        currentUser.trades.push({
+            type: 'buy',
+            commodity: commodity.name,
+            symbol: symbol,
+            amount: amount,
+            price: commodity.price,
+            total: totalCost,
+            timestamp: new Date().toISOString()
+        });
+        
+        updateUser();
+        showNotification(`Bought ${amount} ${commodity.name} tokens for K${totalCost}`, 'success');
+        
+    } else if (action === 'sell') {
+        const userTokens = currentUser.tokens[symbol.toLowerCase()] || 0;
+        
+        if (userTokens < amount) {
+            showNotification(`You don't have enough ${commodity.name} tokens. You have ${userTokens} tokens.`, 'error');
+            return;
+        }
+        
+        const profit = amount * commodity.price * 0.5; // 50% of current price as profit
+        
+        currentUser.wallet += profit;
+        currentUser.tokens[symbol.toLowerCase()] -= amount;
+        
+        // Add to trade history
+        if (!currentUser.trades) currentUser.trades = [];
+        currentUser.trades.push({
+            type: 'sell',
+            commodity: commodity.name,
+            symbol: symbol,
+            amount: amount,
+            price: commodity.price,
+            total: profit,
+            timestamp: new Date().toISOString()
+        });
+        
+        updateUser();
+        showNotification(`Sold ${amount} ${commodity.name} tokens for K${profit.toFixed(2)} profit`, 'success');
+    }
+    
+    loadTradingDashboard();
+    loadTradingModalData();
+}
+
+function closeTradingModal() {
+    document.getElementById('tradingModal').style.display = 'none';
+}
+
+function loadTradingDashboard() {
+    if (!currentUser) return;
+    
+    const tradingStats = document.getElementById('tradingStats');
+    if (!tradingStats) return;
+    
+    const totalTokens = Object.values(currentUser.tokens || {}).reduce((sum, tokens) => sum + tokens, 0);
+    const recentTrades = (currentUser.trades || []).slice(-5).reverse();
+    
+    tradingStats.innerHTML = `
+        <div class="stat-card">
+            <h4>Total Tokens</h4>
+            <p>${totalTokens}</p>
+        </div>
+        <div class="stat-card">
+            <h4>Recent Trades</h4>
+            <div class="trades-list">
+                ${recentTrades.map(trade => `
+                    <div class="trade-item">
+                        <span>${trade.type.toUpperCase()} ${trade.amount} ${trade.commodity}</span>
+                        <span>K${trade.total.toFixed(2)}</span>
+                    </div>
+                `).join('') || '<p>No recent trades</p>'}
+            </div>
+        </div>
+    `;
+}
+
+// ZedAI Functions
+function showZedAI() {
+    if (!currentUser) {
+        showModal('loginModal');
+        showNotification('Please login to access ZedAI', 'info');
+        return;
+    }
+    
+    if (currentUser.plan !== 'premium-k100') {
+        showPremiumUpgrade();
+        return;
+    }
+    
+    showModal('zedaiModal');
+    loadZedAIData();
+}
+
+function showPremiumUpgrade() {
+    showModal('premiumUpgradeModal');
+}
+
+function loadZedAIData() {
+    // Simulate AI recommendations
+    const recommendations = [
+        { title: 'Web Developer Position', match: '95%', reason: 'Perfect match for your React skills' },
+        { title: 'Mobile App Developer', match: '87%', reason: 'Good fit for your JavaScript experience' },
+        { title: 'UI/UX Designer', match: '72%', reason: 'Matches your design portfolio' }
+    ];
+    
+    const recommendationsList = document.getElementById('aiRecommendations');
+    if (recommendationsList) {
+        recommendationsList.innerHTML = recommendations.map(rec => `
+            <div class="recommendation-item">
+                <h4>${rec.title}</h4>
+                <p class="match-score">${rec.match} match</p>
+                <p class="reason">${rec.reason}</p>
+                <button class="apply-btn">Apply with AI Proposal</button>
+            </div>
+        `).join('');
+    }
+}
+
+// ZedInvest Functions
+function showZedInvest() {
+    showModal('zedinvestModal');
+}
+
+function showBusinessModal() {
+    showModal('businessModal');
+}
+
+function showInvestmentHistoryModal() {
+    showModal('investmentHistoryModal');
+}
+
+// Payment Functions
+function showFlutterwavePayment() {
+    showModal('flutterwaveModal');
+}
+
+// Offline Jobs Functions
+function showOfflineJobPosting() {
+    showModal('offlineJobModal');
+}
+
+// Admin Functions
+function initializeAdminAccess() {
+    let adminKeySequence = '';
+    
+    document.addEventListener('keydown', (e) => {
+        adminKeySequence += e.key.toLowerCase();
+        
+        if (adminKeySequence.includes('zedhustle')) {
+            adminKeySequence = '';
+            showSecureAdminLogin();
+        }
+        
+        // Clear sequence if it gets too long
+        if (adminKeySequence.length > 20) {
+            adminKeySequence = '';
+        }
+    });
+    
+    // Check for admin hash in URL
+    if (window.location.hash === '#admin' || window.location.hash === '#zedadmin') {
+        showSecureAdminLogin();
+    }
+}
+
+function showSecureAdminLogin() {
+    showModal('adminLoginModal');
+}
+
+function handleAdminLogin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('adminEmail').value;
+    const password = document.getElementById('adminPassword').value;
+    
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD_HASH) {
+        closeAllModals();
+        showAdminPanel();
+        showNotification('Admin access granted', 'success');
+    } else {
+        showNotification('Invalid admin credentials', 'error');
+    }
+}
+
+function showAdminPanel() {
+    showModal('adminDashboard');
+    loadAdminData();
+}
+
+function loadAdminData() {
+    const users = JSON.parse(localStorage.getItem('zedHustleUsers') || '[]');
+    
+    // Update admin stats
+    document.getElementById('totalUsers').textContent = users.length;
+    document.getElementById('totalRevenue').textContent = `K${(users.length * 25).toFixed(2)}`; // K25 hidden fee per user
+    document.getElementById('activeTraders').textContent = users.filter(u => u.trades && u.trades.length > 0).length;
+    
+    // Load recent activity
+    const recentActivity = [
+        'New user registered: John Doe',
+        'Payment verified: K100 - Jane Smith',
+        'Job posted: Web Developer Position',
+        'Trade executed: 5 Copper tokens - Mike Johnson'
+    ];
+    
+    document.getElementById('recentActivity').innerHTML = recentActivity.map(activity => 
+        `<div class="activity-item">${activity}</div>`
+    ).join('');
+}
+
+// Modal Functions
 function showModal(modalId) {
-    document.getElementById(modalId).style.display = 'flex';
+    closeAllModals();
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'block';
+    }
 }
 
 function closeAllModals() {
@@ -422,207 +727,35 @@ function closeAllModals() {
     });
 }
 
+// Utility Functions
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
     notification.textContent = message;
-    
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 3000;
-        background-color: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-    `;
     
     document.body.appendChild(notification);
     
-    setTimeout(() => notification.remove(), 5000);
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Hide notification
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
-function updateUIForLoggedInUser() {
-    const navAuth = document.querySelector('.nav-auth');
-    navAuth.innerHTML = `
-        <span class="user-info">
-            <i class="fas fa-user"></i>
-            ${currentUser.name}
-        </span>
-        <button class="btn btn-outline" onclick="showUserDashboard()">Dashboard</button>
-        <button class="btn btn-primary" onclick="logout()">Logout</button>
-    `;
-    
-    updateUserStats();
-}
-
-function updateUserStats() {
-    if (!currentUser) return;
-    
-    let statsDisplay = document.querySelector('.user-stats');
-    if (!statsDisplay) {
-        statsDisplay = document.createElement('div');
-        statsDisplay.className = 'user-stats';
-        document.querySelector('.nav-container').appendChild(statsDisplay);
+// Close modals when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        closeAllModals();
     }
-    
-    statsDisplay.innerHTML = `
-        <div class="stat-item">
-            <i class="fas fa-coins"></i>
-            <span>${currentUser.bids} Bids</span>
-        </div>
-        <div class="stat-item">
-            <i class="fas fa-wallet"></i>
-            <span>K${currentUser.wallet.toFixed(2)}</span>
-        </div>
-    `;
-}
+});
 
-function showUserDashboard() {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.style.display = 'flex';
-    
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <h2>Welcome, ${currentUser.name}!</h2>
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <h3>Available Bids</h3>
-                    <p class="stat-value">${currentUser.bids}</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Wallet Balance</h3>
-                    <p class="stat-value">K${currentUser.wallet.toFixed(2)}</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Referral Earnings</h3>
-                    <p class="stat-value">K${currentUser.referralEarnings.toFixed(2)}</p>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-}
-
-async function logout() {
-    try {
-        const { error } = await window.supabaseClient.auth.signOut();
-        if (error) {
-            showNotification('Logout failed: ' + error.message, 'error');
-            return;
-        }
-        
-    currentUser = null;
-    location.reload();
-    } catch (error) {
-        showNotification('Logout failed: ' + error.message, 'error');
+// Initialize admin login form handler
+document.addEventListener('DOMContentLoaded', () => {
+    const adminForm = document.getElementById('adminLoginForm');
+    if (adminForm) {
+        adminForm.addEventListener('submit', handleAdminLogin);
     }
-}
-
-async function checkAuthStatus() {
-    try {
-        const { data: { user }, error } = await window.supabaseClient.auth.getUser();
-        
-        if (error || !user) {
-            return;
-        }
-        
-        // Get user profile from database
-        const { data: userProfile, error: profileError } = await window.supabaseClient
-            .from('users')
-            .select('*')
-            .eq('email', user.email)
-            .single();
-        
-        if (profileError) {
-            console.error('Error loading user profile:', profileError);
-            return;
-        }
-        
-        currentUser = userProfile;
-        updateUIForLoggedInUser();
-        
-    } catch (error) {
-        console.error('Error checking auth status:', error);
-    }
-}
-
-function saveUser(user) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const existingIndex = users.findIndex(u => u.id === user.id);
-    
-    if (existingIndex >= 0) {
-        users[existingIndex] = user;
-    } else {
-        users.push(user);
-    }
-    
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('currentUser', JSON.stringify(user));
-}
-
-function getUserByEmail(email) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    return users.find(user => user.email === email);
-}
-
-function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-function generateReferralCode() {
-    return Math.random().toString(36).substr(2, 8).toUpperCase();
-}
-
-async function processReferral(referralCode, newUserId) {
-    try {
-        // Find referrer by referral code
-        const { data: referrer, error: referrerError } = await window.supabaseClient
-            .from('users')
-            .select('*')
-            .eq('referral_code', referralCode)
-            .single();
-        
-        if (referrerError || !referrer) {
-            console.log('Referral code not found or invalid');
-            return;
-        }
-        
-        // Create referral record
-        const { error: referralError } = await window.supabaseClient
-            .from('referrals')
-            .insert([{
-                referrer_id: referrer.id,
-                referred_user_id: newUserId,
-                status: 'completed'
-            }]);
-        
-        if (referralError) {
-            console.error('Error creating referral record:', referralError);
-            return;
-        }
-        
-        // Update referrer's earnings and wallet
-        const { error: updateError } = await window.supabaseClient
-            .from('users')
-            .update({
-                referral_earnings: referrer.referral_earnings + 5,
-                wallet: referrer.wallet + 5
-            })
-            .eq('id', referrer.id);
-        
-        if (updateError) {
-            console.error('Error updating referrer earnings:', updateError);
-            return;
-        }
-        
-        showNotification(`Referral bonus of K5 credited to ${referrer.name}!`, 'success');
-        
-    } catch (error) {
-        console.error('Error processing referral:', error);
-    }
-} 
+});

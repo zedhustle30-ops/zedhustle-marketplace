@@ -4,23 +4,13 @@
   "description": "ZED HUSTLE - Freelance Marketplace with AI-Powered Commodity Trading",
   "main": "index.html",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "update-prices": "node scripts/update-prices.js"
+    "start": "http-server public -p 3000",
+    "dev": "http-server public -p 3000 -o",
+    "build": "echo 'Static site - no build needed'",
+    "serve": "http-server public"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.0",
-    "openai": "^4.20.0",
-    "node-fetch": "^3.3.2",
-    "next": "14.0.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
-  "devDependencies": {
-    "eslint": "^8.0.0",
-    "eslint-config-next": "14.0.0"
+    "http-server": "^14.1.1"
   },
   "keywords": [
     "freelance",
@@ -28,8 +18,12 @@
     "zambia",
     "trading",
     "commodities",
-    "ai"
+    "ai",
+    "static-site"
   ],
   "author": "ZED HUSTLE Team",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }
