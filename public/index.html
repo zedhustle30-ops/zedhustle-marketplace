@@ -16,9 +16,10 @@
                 <span class="logo-text">ZED HUSTLE</span>
             </div>
             <div class="nav-menu" id="nav-menu">
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#services" class="nav-link">Services</a>
-                <a href="#pricing" class="nav-link">Pricing</a>
+                <a href="#feature-catalog" class="nav-link">🚀 Feature Catalog</a>
+                <a href="#jobs" class="nav-link">💼 Jobs</a>
+                <a href="#zedai" class="nav-link">🤖 ZedAI</a>
+                <a href="#trading" class="nav-link">📈 Trading</a>
             </div>
             <div class="nav-auth">
                 <button class="btn btn-outline" id="loginBtn">Sign In</button>
@@ -72,6 +73,142 @@
             </div>
         </section>
 
+        <!-- Quick Access Bar -->
+        <div class="quick-access-bar">
+            <div class="container">
+                <div class="quick-access-content">
+                    <span class="quick-access-label">🚀 Quick Access:</span>
+                    <div class="quick-access-links">
+                        <button onclick="handleFeatureClick('Dashboard')" class="quick-link">📊 Dashboard</button>
+                        <button onclick="handleFeatureClick('Find Jobs')" class="quick-link">🔍 Jobs</button>
+                        <button onclick="handleFeatureClick('ZedAI')" class="quick-link">🤖 ZedAI</button>
+                        <button onclick="handleFeatureClick('ZedForex')" class="quick-link">📈 Trading</button>
+                        <button onclick="handleFeatureClick('ZedInvest')" class="quick-link">💰 Invest</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Catalog Section -->
+        <section id="feature-catalog" class="feature-catalog">
+            <div class="container">
+                <div class="text-center mb-12">
+                    <h2 class="section-title">🚀 Complete Feature Catalog</h2>
+                    <p class="section-subtitle">Your one-stop hub for all ZED HUSTLE features. Click any feature to get started!</p>
+                </div>
+                
+                <!-- Feature Grid -->
+                <div class="feature-catalog-grid">
+                    <div class="feature-catalog-card primary-feature" onclick="handleFeatureClick('Dashboard')">
+                        <div class="feature-catalog-icon">📊</div>
+                        <span class="feature-catalog-name">Dashboard</span>
+                        <span class="feature-catalog-desc">Your personal hub</span>
+                    </div>
+                    <div class="feature-catalog-card primary-feature" onclick="handleFeatureClick('Post Job')">
+                        <div class="feature-catalog-icon">📝</div>
+                        <span class="feature-catalog-name">Post Job</span>
+                        <span class="feature-catalog-desc">Hire talent</span>
+                    </div>
+                    <div class="feature-catalog-card primary-feature" onclick="handleFeatureClick('Find Jobs')">
+                        <div class="feature-catalog-icon">🔍</div>
+                        <span class="feature-catalog-name">Find Jobs</span>
+                        <span class="feature-catalog-desc">Browse opportunities</span>
+                    </div>
+                    <div class="feature-catalog-card premium-feature" onclick="handleFeatureClick('ZedAI')">
+                        <div class="feature-catalog-icon">🤖</div>
+                        <span class="feature-catalog-name">ZedAI</span>
+                        <span class="feature-catalog-desc">AI-powered assistance</span>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <div class="feature-catalog-card premium-feature" onclick="handleFeatureClick('ZedForex')">
+                        <div class="feature-catalog-icon">📈</div>
+                        <span class="feature-catalog-name">ZedForex</span>
+                        <span class="feature-catalog-desc">Commodity trading</span>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <div class="feature-catalog-card premium-feature" onclick="handleFeatureClick('ZedInvest')">
+                        <div class="feature-catalog-icon">💰</div>
+                        <span class="feature-catalog-name">ZedInvest</span>
+                        <span class="feature-catalog-desc">Micro-investments</span>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <div class="feature-catalog-card" onclick="handleFeatureClick('Wallet')">
+                        <div class="feature-catalog-icon">💳</div>
+                        <span class="feature-catalog-name">Wallet</span>
+                        <span class="feature-catalog-desc">Manage funds</span>
+                    </div>
+                    <div class="feature-catalog-card" onclick="handleFeatureClick('Referrals')">
+                        <div class="feature-catalog-icon">👥</div>
+                        <span class="feature-catalog-name">Referrals</span>
+                        <span class="feature-catalog-desc">Earn rewards</span>
+                    </div>
+                    <div class="feature-catalog-card" onclick="handleFeatureClick('Profile')">
+                        <div class="feature-catalog-icon">👤</div>
+                        <span class="feature-catalog-name">Profile</span>
+                        <span class="feature-catalog-desc">Your settings</span>
+                    </div>
+                    <div class="feature-catalog-card" onclick="handleFeatureClick('Settings')">
+                        <div class="feature-catalog-icon">⚙️</div>
+                        <span class="feature-catalog-name">Settings</span>
+                        <span class="feature-catalog-desc">Preferences</span>
+                    </div>
+                    <div class="feature-catalog-card" onclick="handleFeatureClick('Help')">
+                        <div class="feature-catalog-icon">❓</div>
+                        <span class="feature-catalog-name">Help</span>
+                        <span class="feature-catalog-desc">Support center</span>
+                    </div>
+                    <div class="feature-catalog-card" onclick="handleFeatureClick('Notifications')">
+                        <div class="feature-catalog-icon">🔔</div>
+                        <span class="feature-catalog-name">Notifications</span>
+                        <span class="feature-catalog-desc">Stay updated</span>
+                    </div>
+                    <div class="feature-catalog-card" onclick="handleFeatureClick('Messages')">
+                        <div class="feature-catalog-icon">💬</div>
+                        <span class="feature-catalog-name">Messages</span>
+                        <span class="feature-catalog-desc">Communicate</span>
+                    </div>
+                    <div class="feature-catalog-card logout-feature" onclick="handleFeatureClick('Logout')">
+                        <div class="feature-catalog-icon">🚪</div>
+                        <span class="feature-catalog-name">Logout</span>
+                        <span class="feature-catalog-desc">Sign out</span>
+                    </div>
+                </div>
+                
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <div class="text-center">
+                        <h3 class="welcome-title">🎯 Welcome back, there!</h3>
+                        <p class="welcome-subtitle">Here's what's happening with your ZedHustle journey</p>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-content">
+                                <h4 class="stat-value" id="availableBids">50</h4>
+                                <p class="stat-label">Available Bids</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💵</div>
+                            <div class="stat-content">
+                                <h4 class="stat-value" id="walletBalance">K0.00</h4>
+                                <p class="stat-label">Wallet Balance</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-content">
+                                <h4 class="stat-value" id="activeJobs">0</h4>
+                                <p class="stat-label">Active Jobs</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Features Section -->
         <section class="features">
             <div class="container">
@@ -84,7 +221,7 @@
                         <h3>Bidding System</h3>
                         <p>Use bids to apply for jobs. More bids, more opportunities to land your dream gig.</p>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-catalog-card">
                         <div class="feature-icon">
                             <i class="fas fa-coins"></i>
                         </div>
@@ -1139,6 +1276,17 @@
             </div>
         </div>
     </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- Back to Catalog Button -->
+    <button id="backToCatalog" class="back-to-catalog" onclick="scrollToCatalog()">
+        <i class="fas fa-th-large"></i>
+        <span>Catalog</span>
+    </button>
 
     <!-- Footer -->
     <footer class="footer">

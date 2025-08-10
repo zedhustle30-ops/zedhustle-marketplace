@@ -6,13 +6,17 @@
   "scripts": {
     "start": "http-server public -p 3000",
     "dev": "http-server public -p 3000 -o",
-    "build": "echo 'No build step needed - static files ready'",
+    "build": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch",
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/styles.css",
     "serve": "http-server public",
-    "vercel-build": "echo 'Build complete - static files in public/'"
+    "vercel-build": "echo 'Build complete - static files in public/'",
+    "react:dev": "npm run build:css && npm run dev"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "keywords": [
     "freelance",
@@ -21,7 +25,8 @@
     "trading",
     "commodities",
     "ai",
-    "static-site"
+    "static-site",
+    "react"
   ],
   "author": "ZED HUSTLE Team",
   "license": "MIT",

@@ -1081,3 +1081,189 @@ document.addEventListener('DOMContentLoaded', () => {
         adminForm.addEventListener('submit', handleAdminLogin);
     }
 });
+
+// Back to Top functionality
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+// Back to Catalog functionality
+function scrollToCatalog() {
+    document.getElementById('feature-catalog').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Show/hide back to top button based on scroll position
+window.addEventListener('scroll', () => {
+    const backToTopBtn = document.getElementById('backToTop');
+    const backToCatalogBtn = document.getElementById('backToCatalog');
+    
+    if (backToTopBtn) {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.style.display = 'block';
+        } else {
+            backToTopBtn.style.display = 'none';
+        }
+    }
+    
+    // Show back to catalog button when scrolling past feature catalog
+    if (backToCatalogBtn) {
+        const featureCatalog = document.getElementById('feature-catalog');
+        if (featureCatalog) {
+            const catalogBottom = featureCatalog.offsetTop + featureCatalog.offsetHeight;
+            if (window.pageYOffset > catalogBottom) {
+                backToCatalogBtn.style.display = 'block';
+            } else {
+                backToCatalogBtn.style.display = 'none';
+            }
+        }
+    }
+});
+
+// Feature Catalog Click Handler
+function handleFeatureClick(featureName) {
+    console.log(`Feature clicked: ${featureName}`);
+    
+    // Add visual feedback for the clicked card
+    const clickedCard = event.currentTarget;
+    clickedCard.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        clickedCard.style.transform = 'scale(1)';
+    }, 150);
+    
+    // Add "Back to Catalog" button to all sections
+    addBackToCatalogButtons();
+    
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    // Handle different features with smooth scrolling
+    switch (featureName) {
+        case 'Dashboard':
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => hideLoadingIndicator(), 800);
+            break;
+        case 'Post Job':
+            // Scroll to jobs section and highlight post job button
+            document.getElementById('jobs').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                const postJobBtn = document.getElementById('postJobBtn');
+                if (postJobBtn) {
+                    postJobBtn.style.animation = 'pulse 1s ease-in-out';
+                    setTimeout(() => postJobBtn.style.animation = '', 1000);
+                }
+            }, 500);
+            break;
+        case 'Find Jobs':
+            document.getElementById('jobs').scrollIntoView({ behavior: 'smooth' });
+            break;
+        case 'ZedAI':
+            document.getElementById('zedai').scrollIntoView({ behavior: 'smooth' });
+            break;
+        case 'ZedForex':
+            document.getElementById('trading').scrollIntoView({ behavior: 'smooth' });
+            break;
+        case 'ZedInvest':
+            document.getElementById('zedinvest').scrollIntoView({ behavior: 'smooth' });
+            break;
+        case 'Wallet':
+            // Show wallet info in dashboard section
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                switchTab('overview');
+            }, 500);
+            break;
+        case 'Referrals':
+            // Show referral section in dashboard
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                switchTab('overview');
+            }, 500);
+            break;
+        case 'Profile':
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                switchTab('profile');
+            }, 500);
+            break;
+        case 'Settings':
+            // Show settings in dashboard
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                switchTab('overview');
+            }, 500);
+            break;
+        case 'Help':
+            // Scroll to footer for contact info
+            document.querySelector('.footer').scrollIntoView({ behavior: 'smooth' });
+            break;
+        case 'Notifications':
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                switchTab('notifications');
+            }, 500);
+            break;
+        case 'Messages':
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                switchTab('messages');
+            }, 500);
+            break;
+        case 'Logout':
+            logout();
+            break;
+        default:
+            showNotification(`Feature ${featureName} is coming soon!`, 'info');
+    }
+}
+
+// Show loading indicator
+function showLoadingIndicator() {
+    const loading = document.createElement('div');
+    loading.id = 'pageLoading';
+    loading.className = 'page-loading';
+    loading.innerHTML = '<div class="loading-spinner"></div><span>Loading...</span>';
+    document.body.appendChild(loading);
+    
+    setTimeout(() => {
+        loading.classList.add('show');
+    }, 10);
+}
+
+// Hide loading indicator
+function hideLoadingIndicator() {
+    const loading = document.getElementById('pageLoading');
+    if (loading) {
+        loading.classList.remove('show');
+        setTimeout(() => {
+            if (loading.parentNode) {
+                loading.parentNode.removeChild(loading);
+            }
+        }, 300);
+    }
+}
+
+// Add "Back to Catalog" buttons to all sections
+function addBackToCatalogButtons() {
+    const sections = ['dashboard', 'jobs', 'zedai', 'trading', 'zedinvest'];
+    
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            // Check if button already exists
+            if (!section.querySelector('.back-to-catalog-btn')) {
+                const backBtn = document.createElement('button');
+                backBtn.className = 'btn btn-outline back-to-catalog-btn';
+                backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Catalog';
+                backBtn.onclick = () => {
+                    document.getElementById('feature-catalog').scrollIntoView({ behavior: 'smooth' });
+                };
+                
+                // Insert at the beginning of the section
+                section.insertBefore(backBtn, section.firstChild);
+            }
+        }
+    });
+}
