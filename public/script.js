@@ -8,62 +8,111 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let jobs = [];
 
-// Sample jobs data
+// Enhanced sample jobs data with more professional categories
 const sampleJobs = [
     {
         id: 1,
-        title: 'Web Developer Needed',
-        company: 'Tech Solutions Ltd',
-        salary: 'K2,500 - K4,000',
-        description: 'We need a skilled web developer to help build our e-commerce platform.',
+        title: 'Senior Full-Stack Developer',
+        company: 'Zambia Digital Solutions',
+        salary: 'K8,000 - K15,000',
+        description: 'Lead development of enterprise applications using modern technologies. Must have 3+ years experience.',
         category: 'web-development',
         location: 'lusaka',
-        tags: ['React', 'Node.js', 'E-commerce'],
-        bidsRequired: 5
+        tags: ['React', 'Node.js', 'PostgreSQL', 'AWS'],
+        bidsRequired: 15,
+        experience: '3+ years',
+        type: 'Full-time'
     },
     {
         id: 2,
-        title: 'Graphic Designer for Branding',
-        company: 'Creative Agency',
-        salary: 'K1,800 - K3,200',
-        description: 'Looking for a creative graphic designer to help with brand identity.',
+        title: 'Creative Brand Designer',
+        company: 'Lusaka Creative Studio',
+        salary: 'K4,500 - K8,000',
+        description: 'Create compelling brand identities, logos, and marketing materials for local businesses.',
         category: 'graphic-design',
-        location: 'remote',
-        tags: ['Adobe Creative Suite', 'Branding'],
-        bidsRequired: 5
+        location: 'lusaka',
+        tags: ['Adobe Creative Suite', 'Branding', 'Logo Design'],
+        bidsRequired: 8,
+        experience: '2+ years',
+        type: 'Contract'
     },
     {
         id: 3,
-        title: 'Content Writer for Blog',
-        company: 'Digital Marketing Co',
-        salary: 'K1,200 - K2,500',
-        description: 'Looking for engaging content writers for our blog and social media.',
-        category: 'writing',
+        title: 'SEO Content Strategist',
+        company: 'Digital Growth Zambia',
+        salary: 'K3,500 - K6,500',
+        description: 'Develop SEO-optimized content strategies and write engaging content for multiple industries.',
+        category: 'content-writing',
         location: 'remote',
-        tags: ['Content Writing', 'SEO', 'Social Media'],
-        bidsRequired: 5
+        tags: ['SEO', 'Content Strategy', 'Copywriting'],
+        bidsRequired: 10,
+        experience: '2+ years',
+        type: 'Remote'
     },
     {
         id: 4,
-        title: 'Mobile App Developer',
-        company: 'StartupTech',
-        salary: 'K3,000 - K5,500',
-        description: 'Develop a mobile app for iOS and Android using React Native.',
+        title: 'Mobile App Developer (Flutter)',
+        company: 'TechStart Zambia',
+        salary: 'K6,000 - K12,000',
+        description: 'Build cross-platform mobile applications using Flutter for iOS and Android.',
         category: 'mobile-development',
         location: 'ndola',
-        tags: ['React Native', 'iOS', 'Android'],
-        bidsRequired: 10
+        tags: ['Flutter', 'Dart', 'Mobile Development'],
+        bidsRequired: 12,
+        experience: '2+ years',
+        type: 'Full-time'
     },
     {
         id: 5,
-        title: 'Data Entry Specialist',
-        company: 'Business Solutions',
-        salary: 'K800 - K1,500',
-        description: 'Accurate data entry for customer records and inventory management.',
-        category: 'data-entry',
+        title: 'Data Analyst & Business Intelligence',
+        company: 'Zambia Business Analytics',
+        salary: 'K5,500 - K10,000',
+        description: 'Analyze business data and create insights using Power BI, Excel, and SQL.',
+        category: 'data-analytics',
         location: 'kitwe',
-        tags: ['Excel', 'Data Entry', 'Accuracy'],
-        bidsRequired: 5
+        tags: ['Power BI', 'Excel', 'SQL', 'Data Analysis'],
+        bidsRequired: 10,
+        experience: '2+ years',
+        type: 'Full-time'
+    },
+    {
+        id: 6,
+        title: 'Digital Marketing Specialist',
+        company: 'Growth Marketing Zambia',
+        salary: 'K4,000 - K7,500',
+        description: 'Manage social media campaigns, Google Ads, and email marketing for local businesses.',
+        category: 'marketing',
+        location: 'lusaka',
+        tags: ['Social Media', 'Google Ads', 'Email Marketing'],
+        bidsRequired: 8,
+        experience: '1+ years',
+        type: 'Contract'
+    },
+    {
+        id: 7,
+        title: 'UI/UX Designer',
+        company: 'User Experience Zambia',
+        salary: 'K5,000 - K9,000',
+        description: 'Design intuitive user interfaces and improve user experience for web and mobile apps.',
+        category: 'ui-ux-design',
+        location: 'remote',
+        tags: ['Figma', 'UI Design', 'UX Research'],
+        bidsRequired: 10,
+        experience: '2+ years',
+        type: 'Remote'
+    },
+    {
+        id: 8,
+        title: 'Video Editor & Animator',
+        company: 'Creative Media Zambia',
+        salary: 'K3,500 - K6,500',
+        description: 'Create engaging video content, animations, and promotional videos for businesses.',
+        category: 'video-production',
+        location: 'lusaka',
+        tags: ['Adobe Premiere', 'After Effects', 'Animation'],
+        bidsRequired: 8,
+        experience: '1+ years',
+        type: 'Contract'
     }
 ];
 
@@ -153,6 +202,7 @@ function initializeEventListeners() {
     // Job filters
     document.getElementById('categoryFilter')?.addEventListener('change', filterJobs);
     document.getElementById('locationFilter')?.addEventListener('change', filterJobs);
+    document.getElementById('experienceFilter')?.addEventListener('change', filterJobs);
     
     // Dashboard tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -404,37 +454,81 @@ async function loadJobs() {
         jobs = [...sampleJobs]; // Fallback to sample data
     }
     
-    jobsList.innerHTML = jobs.map(job => `
-        <div class="job-card" data-category="${job.category}" data-location="${job.location}">
-            <h3>${job.title}</h3>
-            <p class="company">${job.company}</p>
-            <p class="salary">${job.salary}</p>
-            <p class="description">${job.description}</p>
-            <div class="job-tags">
-                ${job.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+    jobsList.innerHTML = jobs.map(job => {
+        // Determine experience level for filtering
+        let experienceLevel = 'entry';
+        if (job.experience && job.experience.includes('3+') || job.experience && job.experience.includes('5+')) {
+            experienceLevel = 'senior';
+        } else if (job.experience && job.experience.includes('2+')) {
+            experienceLevel = 'mid';
+        }
+        
+        return `
+            <div class="job-card" data-category="${job.category}" data-location="${job.location}" data-experience="${experienceLevel}">
+                <div class="job-header">
+                    <div class="job-title-section">
+                        <h3 class="job-title">${job.title}</h3>
+                        <span class="job-type ${job.type?.toLowerCase().replace(' ', '-') || 'full-time'}">${job.type || 'Full-time'}</span>
+                    </div>
+                    <div class="company-info">
+                        <i class="fas fa-building"></i>
+                        <span class="company-name">${job.company}</span>
+                    </div>
+                </div>
+                
+                <div class="job-details">
+                    <div class="salary-info">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span class="salary">${job.salary}</span>
+                    </div>
+                    <div class="experience-info">
+                        <i class="fas fa-user-tie"></i>
+                        <span class="experience">${job.experience || 'Not specified'}</span>
+                    </div>
+                    <div class="location-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="location">${job.location.charAt(0).toUpperCase() + job.location.slice(1)}</span>
+                    </div>
+                </div>
+                
+                <p class="description">${job.description}</p>
+                
+                <div class="job-tags">
+                    ${job.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+                
+                <div class="job-footer">
+                    <div class="bids-info">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span class="bids-required">${job.bidsRequired} bids required</span>
+                    </div>
+                    <button class="apply-btn" onclick="applyForJob(${job.id})">
+                        <i class="fas fa-paper-plane"></i>
+                        Apply Now
+                    </button>
+                </div>
             </div>
-            <div class="job-footer">
-                <span class="bids-required">${job.bidsRequired} bids required</span>
-                <button class="apply-btn" onclick="applyForJob(${job.id})">Apply Now</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function filterJobs() {
     const categoryFilter = document.getElementById('categoryFilter').value;
     const locationFilter = document.getElementById('locationFilter').value;
+    const experienceFilter = document.getElementById('experienceFilter').value;
     
     const jobCards = document.querySelectorAll('.job-card');
     
     jobCards.forEach(card => {
         const category = card.dataset.category;
         const location = card.dataset.location;
+        const experience = card.dataset.experience;
         
         const categoryMatch = !categoryFilter || category === categoryFilter;
         const locationMatch = !locationFilter || location === locationFilter;
+        const experienceMatch = !experienceFilter || experience === experienceFilter;
         
-        card.style.display = (categoryMatch && locationMatch) ? 'block' : 'none';
+        card.style.display = (categoryMatch && locationMatch && experienceMatch) ? 'block' : 'none';
     });
 }
 

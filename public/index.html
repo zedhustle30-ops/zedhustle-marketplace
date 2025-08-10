@@ -236,23 +236,33 @@
             <div class="container">
                 <h2 class="section-title">Latest Job Opportunities</h2>
                 <div class="jobs-filters">
-                    <select id="categoryFilter" class="filter-select">
-                        <option value="">All Categories</option>
-                        <option value="web-development">Web Development</option>
-                        <option value="graphic-design">Graphic Design</option>
-                        <option value="content-writing">Content Writing</option>
-                        <option value="marketing">Marketing</option>
-                        <option value="mobile-development">Mobile Development</option>
-                        <option value="data-entry">Data Entry</option>
-                    </select>
-                    <select id="locationFilter" class="filter-select">
-                        <option value="">All Locations</option>
-                        <option value="lusaka">Lusaka</option>
-                        <option value="kitwe">Kitwe</option>
-                        <option value="ndola">Ndola</option>
-                        <option value="remote">Remote</option>
-                    </select>
-                    <button class="btn btn-primary" id="postJobBtn">Post a Job</button>
+                    <div class="filter-group">
+                        <select id="categoryFilter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="web-development">🌐 Web Development</option>
+                            <option value="graphic-design">🎨 Graphic Design</option>
+                            <option value="content-writing">✍️ Content Writing</option>
+                            <option value="marketing">📈 Digital Marketing</option>
+                            <option value="mobile-development">📱 Mobile Development</option>
+                            <option value="data-analytics">📊 Data Analytics</option>
+                            <option value="ui-ux-design">🎯 UI/UX Design</option>
+                            <option value="video-production">🎬 Video Production</option>
+                        </select>
+                        <select id="locationFilter" class="filter-select">
+                            <option value="">📍 All Locations</option>
+                            <option value="lusaka">🏙️ Lusaka</option>
+                            <option value="kitwe">🏭 Kitwe</option>
+                            <option value="ndola">🏢 Ndola</option>
+                            <option value="remote">🌍 Remote</option>
+                        </select>
+                        <select id="experienceFilter" class="filter-select">
+                            <option value="">👥 All Experience Levels</option>
+                            <option value="entry">🚀 Entry Level (0-1 years)</option>
+                            <option value="mid">💼 Mid Level (2-4 years)</option>
+                            <option value="senior">👑 Senior (5+ years)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="postJobBtn">📝 Post a Job</button>
                 </div>
                 <div class="jobs-grid" id="jobsList">
                     <!-- Jobs will be loaded here dynamically -->
