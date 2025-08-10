@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZED HUSTLE Feature Catalog - Standalone Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .feature-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .feature-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .post-job-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .logout-btn {
+            border: 2px solid #ef4444;
+            color: #dc2626;
+        }
+        .logout-btn:hover {
+            background-color: #fef2f2;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                🇿🇲 ZED HUSTLE
+            </h1>
+            <p class="text-lg text-gray-600">
+                Your complete freelance marketplace dashboard
+            </p>
+        </div>
+
+        <!-- Feature Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <!-- Browse Jobs -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Browse Jobs')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📁</span>
+                    <span class="font-medium text-sm text-gray-800">Browse Jobs</span>
+                </div>
+            </div>
+
+            <!-- Post Job -->
+            <div class="feature-card post-job-btn rounded-xl p-4 cursor-pointer text-white" onclick="handleFeatureClick('Post Job')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">➕</span>
+                    <span class="font-medium text-sm">Post Job</span>
+                </div>
+            </div>
+
+            <!-- Wage Jobs -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Wage Jobs')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">⚒</span>
+                    <span class="font-medium text-sm text-gray-800">Wage Jobs</span>
+                </div>
+            </div>
+
+            <!-- Employment -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Employment')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🏢</span>
+                    <span class="font-medium text-sm text-gray-800">Employment</span>
+                </div>
+            </div>
+
+            <!-- Online -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Online')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">💻</span>
+                    <span class="font-medium text-sm text-gray-800">Online</span>
+                </div>
+            </div>
+
+            <!-- Referrals -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Referrals')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🎁</span>
+                    <span class="font-medium text-sm text-gray-800">Referrals</span>
+                </div>
+            </div>
+
+            <!-- AI Tools -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('AI Tools')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🤖</span>
+                    <span class="font-medium text-sm text-gray-800">AI Tools</span>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Map')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🗺</span>
+                    <span class="font-medium text-sm text-gray-800">Map</span>
+                </div>
+            </div>
+
+            <!-- ZedTrading -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('ZedTrading')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📈</span>
+                    <span class="font-medium text-sm text-gray-800">ZedTrading</span>
+                </div>
+            </div>
+
+            <!-- Withdrawal -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Withdrawal')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">💰</span>
+                    <span class="font-medium text-sm text-gray-800">Withdrawal</span>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Messages')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">💬</span>
+                    <span class="font-medium text-sm text-gray-800">Messages</span>
+                </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Payment')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">💳</span>
+                    <span class="font-medium text-sm text-gray-800">Payment</span>
+                </div>
+            </div>
+
+            <!-- Profile -->
+            <div class="feature-card bg-white rounded-xl p-4 cursor-pointer border border-gray-100" onclick="handleFeatureClick('Profile')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">⚙</span>
+                    <span class="font-medium text-sm text-gray-800">Profile</span>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="feature-card logout-btn bg-white rounded-xl p-4 cursor-pointer" onclick="handleFeatureClick('Logout')">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🚪</span>
+                    <span class="font-medium text-sm">Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-900 mb-3">
+                    Welcome back, there!
+                </h2>
+                <p class="text-lg text-gray-600">
+                    Here's what's happening with your ZedHustle journey
+                </p>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div class="text-center p-4 bg-blue-50 rounded-xl">
+                    <div class="text-2xl font-bold text-blue-600 mb-2">0</div>
+                    <div class="text-sm text-blue-800">Available Bids</div>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-xl">
+                    <div class="text-2xl font-bold text-green-600 mb-2">K0.00</div>
+                    <div class="text-sm text-green-800">Wallet Balance</div>
+                </div>
+                <div class="text-center p-4 bg-purple-50 rounded-xl">
+                    <div class="text-2xl font-bold text-purple-600 mb-2">0</div>
+                    <div class="text-sm text-purple-800">Active Jobs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Note -->
+        <div class="mt-8 text-center">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 inline-block">
+                <p class="text-blue-800 text-sm">
+                    💡 <strong>Ready to integrate!</strong> This component can be easily added to your existing ZED HUSTLE website at 
+                    <a href="https://zedhustlemarket.vercel.app/" target="_blank" class="underline font-medium">zedhustlemarket.vercel.app</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleFeatureClick(featureName) {
+            console.log(`Clicked on: ${featureName}`);
+            
+            // Add your navigation logic here
+            // For now, just show an alert
+            alert(`You clicked on: ${featureName}\n\nThis would navigate to the ${featureName} section in your ZED HUSTLE app.`);
+            
+            // Example of how you could integrate this with your existing app:
+            // if (featureName === 'Browse Jobs') {
+            //     window.location.href = 'https://zedhustlemarket.vercel.app/#jobs';
+            // } else if (featureName === 'Post Job') {
+            //     window.location.href = 'https://zedhustlemarket.vercel.app/#post-job';
+            // }
+            // etc...
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                    this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

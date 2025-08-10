@@ -364,6 +364,17 @@ function generateReferralCode() {
 async function logout() {
     currentUser = null;
     localStorage.removeItem('zedHustleCurrentUser');
+    
+    // Hide feature catalog and quick access bar
+    const featureCatalog = document.getElementById('feature-catalog');
+    const quickAccessBar = document.getElementById('quickAccessBar');
+    if (featureCatalog) featureCatalog.classList.add('hidden');
+    if (quickAccessBar) quickAccessBar.classList.add('hidden');
+    
+    // Show welcome message
+    const welcomeMessage = document.getElementById('welcome-message');
+    if (welcomeMessage) welcomeMessage.classList.remove('hidden');
+    
     updateAuthUI();
     showNotification('Logged out successfully', 'success');
     document.getElementById('dashboard').style.display = 'none';
@@ -377,9 +388,16 @@ async function checkAuthStatus() {
             currentUser = JSON.parse(savedUser);
             updateAuthUI();
             loadUserDashboard();
+        } else {
+            // Ensure welcome message is shown for non-authenticated users
+            const welcomeMessage = document.getElementById('welcome-message');
+            if (welcomeMessage) welcomeMessage.classList.remove('hidden');
         }
     } catch (error) {
         console.error('Auth check error:', error);
+        // Ensure welcome message is shown on error
+        const welcomeMessage = document.getElementById('welcome-message');
+        if (welcomeMessage) welcomeMessage.classList.remove('hidden');
     }
 }
 
@@ -388,6 +406,9 @@ function updateAuthUI() {
     const signupBtn = document.getElementById('signupBtn');
     const userMenu = document.getElementById('userMenu');
     const userName = document.getElementById('userName');
+    const featureCatalog = document.getElementById('feature-catalog');
+    const quickAccessBar = document.getElementById('quickAccessBar');
+    const welcomeMessage = document.getElementById('welcome-message');
     
     if (currentUser) {
         if (loginBtn) loginBtn.style.display = 'none';
@@ -397,6 +418,13 @@ function updateAuthUI() {
         // Handle both Supabase and localStorage user name formats
         const displayName = currentUser.fullName || currentUser.full_name || currentUser.email || 'User';
         if (userName) userName.textContent = displayName;
+        
+        // Show feature catalog and quick access bar for authenticated users
+        if (featureCatalog) featureCatalog.classList.remove('hidden');
+        if (quickAccessBar) quickAccessBar.classList.remove('hidden');
+        
+        // Hide welcome message for authenticated users
+        if (welcomeMessage) welcomeMessage.classList.add('hidden');
         
         // Show dashboard and load user data
         const dashboard = document.getElementById('dashboard');
@@ -410,6 +438,13 @@ function updateAuthUI() {
         if (loginBtn) loginBtn.style.display = 'block';
         if (signupBtn) signupBtn.style.display = 'block';
         if (userMenu) userMenu.style.display = 'none';
+        
+        // Hide feature catalog and quick access bar for non-authenticated users
+        if (featureCatalog) featureCatalog.classList.add('hidden');
+        if (quickAccessBar) quickAccessBar.classList.add('hidden');
+        
+        // Show welcome message for non-authenticated users
+        if (welcomeMessage) welcomeMessage.classList.remove('hidden');
         
         // Hide dashboard
         const dashboard = document.getElementById('dashboard');

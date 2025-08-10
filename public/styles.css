@@ -1514,7 +1514,9 @@ body {
 .mt-2 { margin-top: 0.5rem; }
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
-.hidden { display: none; }
+.hidden {
+    display: none !important;
+}
 .visible { display: block; }
 
 /* Notification Styles */
@@ -1902,6 +1904,40 @@ body {
     color: var(--text-gray);
     font-size: 0.9rem;
     margin: 0;
+}
+
+/* Welcome Message Styles */
+.welcome-message {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    text-align: center;
+}
+
+.welcome-message .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.welcome-message .section-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-gray);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.welcome-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.welcome-buttons .btn {
+    min-width: 140px;
 }
 
 /* Responsive Design */

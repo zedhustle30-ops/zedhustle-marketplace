@@ -16,7 +16,6 @@
                 <span class="logo-text">ZED HUSTLE</span>
             </div>
             <div class="nav-menu" id="nav-menu">
-                <a href="#feature-catalog" class="nav-link">🚀 Feature Catalog</a>
                 <a href="#jobs" class="nav-link">💼 Jobs</a>
                 <a href="#zedai" class="nav-link">🤖 ZedAI</a>
                 <a href="#trading" class="nav-link">📈 Trading</a>
@@ -73,8 +72,22 @@
             </div>
         </section>
 
+        <!-- Welcome Message for Non-Authenticated Users -->
+        <section id="welcome-message" class="welcome-message">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-title">🎯 Welcome to ZED HUSTLE!</h2>
+                    <p class="section-subtitle">Sign in or create an account to unlock our complete feature catalog and start earning today.</p>
+                    <div class="welcome-buttons">
+                        <button class="btn btn-primary" onclick="showModal('loginModal')">Sign In</button>
+                        <button class="btn btn-outline" onclick="showModal('signupModal')">Create Account</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Quick Access Bar -->
-        <div class="quick-access-bar">
+        <div class="quick-access-bar hidden" id="quickAccessBar">
             <div class="container">
                 <div class="quick-access-content">
                     <span class="quick-access-label">🚀 Quick Access:</span>
@@ -90,7 +103,7 @@
         </div>
 
         <!-- Feature Catalog Section -->
-        <section id="feature-catalog" class="feature-catalog">
+        <section id="feature-catalog" class="feature-catalog hidden">
             <div class="container">
                 <div class="text-center mb-12">
                     <h2 class="section-title">🚀 Complete Feature Catalog</h2>
@@ -744,7 +757,7 @@
                                 <ul>
                                     <li>✓ 300 bids valid for 7 weeks</li>
                                     <li>✓ Full ZedAI Assistant access</li>
-                                    <li>✓ Video upload for profiles</li>
+                                    <li>✓ Video profile uploads</li>
                                     <li>✓ "Highly Recommended" badge</li>
                                     <li>✓ Priority application placement</li>
                                     <li>✓ AI-powered proposal writing</li>
